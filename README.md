@@ -1,5 +1,6 @@
 # MCPollinations Multimodal MCP Server
 
+[![smithery badge](https://smithery.ai/badge/@pinkpixel-dev/mcpollinations)](https://smithery.ai/server/@pinkpixel-dev/mcpollinations)
 A Model Context Protocol (MCP) server that enables AI assistants to generate images, text, and audio through the Pollinations APIs
 
 ## Features
@@ -20,6 +21,14 @@ A Model Context Protocol (MCP) server that enables AI assistants to generate ima
   - Node.js versions below 16 use an AbortController polyfill
 
 ## Quick Start
+
+### Installing via Smithery
+
+To install mcpollinations for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@pinkpixel-dev/mcpollinations):
+
+```bash
+npx -y @smithery/cli install @pinkpixel-dev/mcpollinations --client claude
+```
 
 The easiest way to use the MCP server:
 
@@ -223,3 +232,4 @@ npm install @pinkpixel/mcpollinations
 # Import in your code
 import { generateImageUrl, generateImage, repsondText, respondAudio, listTextModels, listImageModels, listAudioVoices } from '@pinkpixel/mcpollinations';
 ```
+
