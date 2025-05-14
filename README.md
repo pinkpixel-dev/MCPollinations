@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/pinkpixel-dev-mcpollinations-badge.png)](https://mseep.ai/app/pinkpixel-dev-mcpollinations)
+
 # MCPollinations Multimodal MCP Server
 
 [![smithery badge](https://smithery.ai/badge/@pinkpixel-dev/mcpollinations)](https://smithery.ai/server/@pinkpixel-dev/mcpollinations)
