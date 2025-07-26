@@ -32,7 +32,10 @@ const defaultConfig = {
         "enhance": true
       },
       "text": {
-        "model": "openai"
+        "model": "openai",
+        "temperature": 0.7,
+        "top_p": 0.9,
+        "system": ""
       },
       "audio": {
         "voice": "alloy"
@@ -90,6 +93,7 @@ async function generateMcpConfig() {
     // Resources customization
     console.log('\nResource Directories:');
     console.log('Note: Using relative path (starting with "./") is recommended for portability.');
+    console.log('Absolute path is recommended on Windows or if you will not be moving the configuration file.');
     console.log('These directories will be created automatically if they don\'t exist.');
 
     const outputDir = await prompt(`Output directory for saved files (default: "${config[configKey].resources.output_dir}"): `);
@@ -99,8 +103,8 @@ async function generateMcpConfig() {
 
     // Authentication configuration
     console.log('\nAuthentication Configuration (Optional):');
-    console.log('These settings are optional and provide access to more models and better rate limits.');
-    console.log('Leave empty to use the free tier.');
+    console.log('These settings are optional and should be used only if you are Flower or Nectar tier user. Configuring these settings will provide access to more models and better rate limits for those tiers.');
+    console.log('Leave empty to use the free (seed) tier. Note: some models may not be available without authentication.');
     console.log('Note: You can also set these via environment variables POLLINATIONS_TOKEN and POLLINATIONS_REFERRER');
 
     const authToken = await prompt('API Token (optional): ');
@@ -130,7 +134,7 @@ async function generateMcpConfig() {
     const customizeImage = await promptYesNo('Customize image generation parameters?', false);
 
     if (customizeImage) {
-      console.log('Available image models: "flux", "turbo" (sdxl)');
+      console.log('Available image models: "flux", "turbo", "gptimage". Use the listImageModels tool to see he most recent model list');
       const imageModel = await prompt('Default image model (default: "flux"): ');
       if (imageModel) config[configKey].default_params.image.model = imageModel;
 
@@ -152,9 +156,18 @@ async function generateMcpConfig() {
     const customizeText = await promptYesNo('Customize text generation parameters?', false);
 
     if (customizeText) {
-      console.log('Available text models: "openai", "anthropic", "mistral", "llama", "gemini" - use listTextModels to see all models');
+      console.log('Some generally available text models: "openai", "openai-large", "openai-reasoning". Model choices change frequently - use the listTextModels tool to see all models');
       const textModel = await prompt('Default text model (default: "openai"): ');
       if (textModel) config[configKey].default_params.text.model = textModel;
+
+      const textTemperature = await prompt('Default temperature (0.0-2.0, controls randomness, default: 0.7): ');
+      if (textTemperature) config[configKey].default_params.text.temperature = parseFloat(textTemperature);
+
+      const textTopP = await prompt('Default top_p (0.0-1.0, controls diversity, default: 0.9): ');
+      if (textTopP) config[configKey].default_params.text.top_p = parseFloat(textTopP);
+
+      const textSystem = await prompt('Default system prompt (optional, guides model behavior): ');
+      if (textSystem) config[configKey].default_params.text.system = textSystem;
     }
 
     // Audio parameters

@@ -7,7 +7,7 @@
  */
 export const generateImageUrlSchema = {
   name: 'generateImageUrl',
-  description: 'Generate an image URL from a text prompt',
+  description: 'Generate an image URL from a text prompt. User-configured settings in MCP config will be used as defaults unless specifically overridden.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -17,7 +17,7 @@ export const generateImageUrlSchema = {
       },
       model: {
         type: 'string',
-        description: 'Model name to use for generation (default: "flux"). Available options: "flux", "sdxl", "sd3", "sd15", "flux-schnell", "flux-dev"'
+        description: 'Model name to use for generation (default: user config or "flux"). Use listImageModels to see all available models'
       },
       seed: {
         type: 'number',
@@ -49,7 +49,7 @@ export const generateImageUrlSchema = {
  */
 export const generateImageSchema = {
   name: 'generateImage',
-  description: 'Generate an image, return the base64-encoded data, and save to a file by default',
+  description: 'Generate an image, return the base64-encoded data, and save to a file by default. User-configured settings in MCP config will be used as defaults unless specifically overridden.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -59,7 +59,7 @@ export const generateImageSchema = {
       },
       model: {
         type: 'string',
-        description: 'Model name to use for generation (default: "flux"). Available options: "flux, "turbo" (sdxl),'
+        description: 'Model name to use for generation (default: user config or "flux"). Use listImageModels to see all available models'
       },
       seed: {
         type: 'number',

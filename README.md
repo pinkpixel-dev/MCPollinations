@@ -132,6 +132,23 @@ When generating your MCP configuration, you'll be prompted for optional authenti
 
 Both parameters are completely optional. Leave them empty or unset to use the free tier.
 
+## Using Your Configuration Settings
+
+MCPollinations respects your MCP configuration settings as defaults. When you ask an AI assistant to generate content:
+
+- **Your configured models, output directories, and parameters are used automatically**
+- **To override**: Specifically instruct the AI to use different settings
+  - "Generate an image using the gptimage model"
+  - "Save this image to my Desktop folder"
+  - "Use a temperature of 1.2 for this text generation"
+
+**Example Instructions:**
+- ✅ "Generate a sunset image" → Uses your configured model and output directory
+- ✅ "Generate a sunset image with the flux model" → Overrides model only
+- ✅ "Generate a sunset image and save it to C:\Pictures" → Overrides output path only
+
+This ensures your preferences are always respected unless you specifically want different settings for a particular request.
+
 ## Troubleshooting
 
 ### "AbortController is not defined" Error
@@ -182,6 +199,50 @@ The MCP server provides the following tools:
 5. `listImageModels` - Lists available models for image generation
 6. `listTextModels` - Lists available models for text generation
 7. `listAudioVoices` - Lists all available voices for audio generation
+
+## Text Generation Details
+
+### Available Parameters
+
+The `respondText` tool supports several parameters for fine-tuning text generation:
+
+- **`model`**: Choose from available text models (use `listTextModels` to see current options)
+- **`temperature`** (0.0-2.0): Controls randomness in the output
+  - Lower values (0.1-0.7) = more focused and deterministic
+  - Higher values (0.8-2.0) = more creative and random
+- **`top_p`** (0.0-1.0): Controls diversity via nucleus sampling
+  - Lower values = more focused on likely tokens
+  - Higher values = considers more token possibilities
+- **`system`**: System prompt to guide the model's behavior and personality
+
+### Customizing Text Generation
+
+```javascript
+// Example options for respondText
+const options = {
+  model: "openai",           // Model selection
+  temperature: 0.7,          // Balanced creativity
+  top_p: 0.9,               // High diversity
+  system: "You are a helpful assistant that explains things clearly and concisely."
+};
+```
+
+### Configuration Examples
+
+In your MCP configuration, you can set defaults:
+
+```json
+{
+  "default_params": {
+    "text": {
+      "model": "openai",
+      "temperature": 0.7,
+      "top_p": 0.9,
+      "system": "You are a helpful coding assistant."
+    }
+  }
+}
+```
 
 ## Image Generation Details
 

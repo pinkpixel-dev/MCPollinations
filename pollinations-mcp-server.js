@@ -125,7 +125,7 @@ if (finalAuthConfig) {
 const server = new Server(
   {
     name: '@pinkpixel/mcpollinations',
-    version: '1.1.2',
+    version: '1.1.3',
   },
   {
     capabilities: {
@@ -292,8 +292,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     }
   } else if (name === 'respondText') {
     try {
-      const { prompt, model = "openai", seed } = args;
-      const result = await respondText(prompt, model, seed, finalAuthConfig);
+      const { prompt, model = "openai", seed, temperature, top_p, system } = args;
+      const result = await respondText(prompt, model, seed, temperature, top_p, system, finalAuthConfig);
       return {
         content: [
           { type: 'text', text: result }
