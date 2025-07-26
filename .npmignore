@@ -7,13 +7,12 @@ test-*.js
 # Development files
 .env
 .env.*
+mcp.json
 node_modules/
 .git/
 .github/
 .gitignore
 .vscode/
-.roo/
-.roorules
 
 # Logs
 *.log
