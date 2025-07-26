@@ -11,9 +11,10 @@
  * @param {string} [voice="alloy"] - Voice to use for audio generation. Available options: "alloy", "echo", "fable", "onyx", "nova", "shimmer", "coral", "verse", "ballad", "ash", "sage", "amuch", "dan"
  * @param {number} [seed] - Seed for reproducible results
  * @param {string} [voiceInstructions] - Additional instructions for voice character/style
+ * @param {Object} [authConfig] - Optional authentication configuration {token, referrer}
  * @returns {Promise<Object>} - Object containing the base64 audio data, mime type, and metadata
  */
-export async function respondAudio(prompt, voice = "alloy", seed, voiceInstructions) {
+export async function respondAudio(prompt, voice = "alloy", seed, voiceInstructions, authConfig = null) {
   if (!prompt || typeof prompt !== 'string') {
     throw new Error('Prompt is required and must be a string');
   }
@@ -41,8 +42,20 @@ export async function respondAudio(prompt, voice = "alloy", seed, voiceInstructi
   url += `?${queryString}`;
 
   try {
+    // Prepare fetch options with optional auth headers
+    const fetchOptions = {};
+    if (authConfig) {
+      fetchOptions.headers = {};
+      if (authConfig.token) {
+        fetchOptions.headers['Authorization'] = `Bearer ${authConfig.token}`;
+      }
+      if (authConfig.referrer) {
+        fetchOptions.headers['Referer'] = authConfig.referrer;
+      }
+    }
+
     // Fetch the audio from the URL
-    const response = await fetch(url);
+    const response = await fetch(url, fetchOptions);
 
     if (!response.ok) {
       throw new Error(`Failed to generate audio: ${response.statusText}`);

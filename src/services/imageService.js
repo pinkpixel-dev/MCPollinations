@@ -14,10 +14,11 @@
  * @param {number} [height=1024] - Height of the generated image
  * @param {boolean} [enhance=true] - Whether to enhance the prompt using an LLM before generating
  * @param {boolean} [safe=false] - Whether to apply content filtering
+ * @param {Object} [authConfig] - Optional authentication configuration {token, referrer}
  * @returns {Object} - Object containing the image URL and metadata
  * @note Always includes nologo=true and private=true parameters
  */
-export async function generateImageUrl(prompt, model = 'flux', seed = Math.floor(Math.random() * 1000000), width = 1024, height = 1024, enhance = true, safe = false) {
+export async function generateImageUrl(prompt, model = 'flux', seed = Math.floor(Math.random() * 1000000), width = 1024, height = 1024, enhance = true, safe = false, authConfig = null) {
   if (!prompt || typeof prompt !== 'string') {
     throw new Error('Prompt is required and must be a string');
   }
@@ -81,20 +82,33 @@ export async function generateImageUrl(prompt, model = 'flux', seed = Math.floor
  * @param {string} [outputPath='./mcpollinations-output'] - Directory path where to save the image
  * @param {string} [fileName] - Name of the file to save (without extension)
  * @param {string} [format='png'] - Image format to save as (png, jpeg, jpg, webp)
+ * @param {Object} [authConfig] - Optional authentication configuration {token, referrer}
  * @returns {Promise<Object>} - Object containing the base64 image data, mime type, metadata, and file path if saved
  * @note Always includes nologo=true and private=true parameters
  */
-export async function generateImage(prompt, model = 'flux', seed = Math.floor(Math.random() * 1000000), width = 1024, height = 1024, enhance = true, safe = false, outputPath = './mcpollinations-output', fileName = '', format = 'png') {
+export async function generateImage(prompt, model = 'flux', seed = Math.floor(Math.random() * 1000000), width = 1024, height = 1024, enhance = true, safe = false, outputPath = './mcpollinations-output', fileName = '', format = 'png', authConfig = null) {
   if (!prompt || typeof prompt !== 'string') {
     throw new Error('Prompt is required and must be a string');
   }
 
   // First, generate the image URL
-  const urlResult = await generateImageUrl(prompt, model, seed, width, height, enhance, safe);
+  const urlResult = await generateImageUrl(prompt, model, seed, width, height, enhance, safe, authConfig);
 
   try {
+    // Prepare fetch options with optional auth headers
+    const fetchOptions = {};
+    if (authConfig) {
+      fetchOptions.headers = {};
+      if (authConfig.token) {
+        fetchOptions.headers['Authorization'] = `Bearer ${authConfig.token}`;
+      }
+      if (authConfig.referrer) {
+        fetchOptions.headers['Referer'] = authConfig.referrer;
+      }
+    }
+
     // Fetch the image from the URL
-    const response = await fetch(urlResult.imageUrl);
+    const response = await fetch(urlResult.imageUrl, fetchOptions);
 
     if (!response.ok) {
       throw new Error(`Failed to generate image: ${response.statusText}`);

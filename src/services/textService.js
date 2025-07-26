@@ -10,9 +10,10 @@
  * @param {string} prompt - The text prompt to generate a response for
  * @param {string} [model="openai"] - Model to use for text generation. Available options: "openai", "anthropic", "mistral", "llama", "gemini"
  * @param {number} [seed] - Seed for reproducible results (default: random)
+ * @param {Object} [authConfig] - Optional authentication configuration {token, referrer}
  * @returns {Promise<string>} - The generated text response
  */
-export async function respondText(prompt, model = "openai", seed = Math.floor(Math.random() * 1000000)) {
+export async function respondText(prompt, model = "openai", seed = Math.floor(Math.random() * 1000000), authConfig = null) {
   if (!prompt || typeof prompt !== 'string') {
     throw new Error('Prompt is required and must be a string');
   }
@@ -34,8 +35,20 @@ export async function respondText(prompt, model = "openai", seed = Math.floor(Ma
   }
 
   try {
+    // Prepare fetch options with optional auth headers
+    const fetchOptions = {};
+    if (authConfig) {
+      fetchOptions.headers = {};
+      if (authConfig.token) {
+        fetchOptions.headers['Authorization'] = `Bearer ${authConfig.token}`;
+      }
+      if (authConfig.referrer) {
+        fetchOptions.headers['Referer'] = authConfig.referrer;
+      }
+    }
+
     // Fetch the text from the URL
-    const response = await fetch(url);
+    const response = await fetch(url, fetchOptions);
 
     if (!response.ok) {
       throw new Error(`Failed to generate text: ${response.statusText}`);

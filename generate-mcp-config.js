@@ -19,6 +19,10 @@ const defaultConfig = {
     "resources": {
       "output_dir": "./mcpollinations-output",
     },
+    "auth": {
+      "token": "",
+      "referrer": ""
+    },
     "default_params": {
       "image": {
         "model": "flux",
@@ -91,6 +95,31 @@ async function generateMcpConfig() {
     const outputDir = await prompt(`Output directory for saved files (default: "${config[configKey].resources.output_dir}"): `);
     if (outputDir) {
       config[configKey].resources.output_dir = outputDir;
+    }
+
+    // Authentication configuration
+    console.log('\nAuthentication Configuration (Optional):');
+    console.log('These settings are optional and provide access to more models and better rate limits.');
+    console.log('Leave empty to use the free tier.');
+    console.log('Note: You can also set these via environment variables POLLINATIONS_TOKEN and POLLINATIONS_REFERRER');
+
+    const authToken = await prompt('API Token (optional): ');
+    if (authToken && authToken.trim()) {
+      config[configKey].auth.token = authToken.trim();
+    } else {
+      delete config[configKey].auth.token;
+    }
+
+    const authReferrer = await prompt('Referrer URL (optional): ');
+    if (authReferrer && authReferrer.trim()) {
+      config[configKey].auth.referrer = authReferrer.trim();
+    } else {
+      delete config[configKey].auth.referrer;
+    }
+
+    // Remove auth section entirely if both fields are empty
+    if (!config[configKey].auth.token && !config[configKey].auth.referrer) {
+      delete config[configKey].auth;
     }
 
     // Default parameters customization

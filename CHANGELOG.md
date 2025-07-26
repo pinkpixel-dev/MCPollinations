@@ -5,6 +5,27 @@ All notable changes to the MCPollinations will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.2] - `2025-07-25`
+
+### Added
+- **Optional Authentication Support**: Added support for optional `token` and `referrer` parameters to access enhanced Pollinations API features
+  - Environment variable support: `POLLINATIONS_TOKEN` and `POLLINATIONS_REFERRER`
+  - MCP configuration file support with new `auth` section
+  - Authorization header (`Bearer token`) and Referer header support in all API requests
+  - Backward compatible - free tier continues to work without authentication
+- Enhanced MCP configuration generator with authentication prompts
+- Updated example-mcp.json to include auth section template
+- Comprehensive documentation updates for authentication setup
+- **Windows Path Guidance**: Added documentation for Windows users to use absolute paths for reliable file saving
+
+### Changed
+- All service functions now accept optional `authConfig` parameter
+- MCP server now reads and passes authentication configuration to services
+- Configuration generator includes new authentication configuration section
+
+### Fixed
+- Improved file path handling documentation for Windows compatibility
+
 ## [1.0.7] - `2025-04-08`
 
 ### Added

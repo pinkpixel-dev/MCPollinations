@@ -102,11 +102,30 @@ import player from 'play-sound';
 // Create audio player instance
 const audioPlayer = player({});
 
+// Read authentication configuration from environment variables
+// These are optional - the server works without them (free tier)
+const authConfig = {
+  token: process.env.POLLINATIONS_TOKEN || null,
+  referrer: process.env.POLLINATIONS_REFERRER || null
+};
+
+// Only create authConfig object if we have at least one auth parameter
+const finalAuthConfig = (authConfig.token || authConfig.referrer) ? authConfig : null;
+
+if (finalAuthConfig) {
+  console.error('Auth configuration loaded:', {
+    hasToken: !!finalAuthConfig.token,
+    hasReferrer: !!finalAuthConfig.referrer
+  });
+} else {
+  console.error('Running in free tier mode (no auth configuration)');
+}
+
 // Create the server instance
 const server = new Server(
   {
     name: '@pinkpixel/mcpollinations',
-    version: '1.0.8',
+    version: '1.1.2',
   },
   {
     capabilities: {
@@ -135,7 +154,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   if (name === 'generateImageUrl') {
     try {
       const { prompt, model = 'flux', seed, width = 1024, height = 1024, enhance = true, safe = false } = args;
-      const result = await generateImageUrl(prompt, model, seed, width, height, enhance, safe);
+      const result = await generateImageUrl(prompt, model, seed, width, height, enhance, safe, finalAuthConfig);
       return {
         content: [
           { type: 'text', text: JSON.stringify(result, null, 2) }
@@ -152,7 +171,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   } else if (name === 'generateImage') {
     try {
       const { prompt, model = 'flux', seed, width = 1024, height = 1024, enhance = true, safe = false, outputPath = './mcpollinations-output', fileName = '', format = 'png' } = args;
-      const result = await generateImage(prompt, model, seed, width, height, enhance, safe, outputPath, fileName, format);
+      const result = await generateImage(prompt, model, seed, width, height, enhance, safe, outputPath, fileName, format, finalAuthConfig);
 
       // Prepare the response content
       const content = [
@@ -186,7 +205,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   } else if (name === 'respondAudio') {
     try {
       const { prompt, voice, seed, voiceInstructions } = args;
-      const result = await respondAudio(prompt, voice, seed, voiceInstructions);
+      const result = await respondAudio(prompt, voice, seed, voiceInstructions, finalAuthConfig);
 
       // Save audio to a temporary file
       const tempDir = os.tmpdir();
@@ -274,7 +293,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   } else if (name === 'respondText') {
     try {
       const { prompt, model = "openai", seed } = args;
-      const result = await respondText(prompt, model, seed);
+      const result = await respondText(prompt, model, seed, finalAuthConfig);
       return {
         content: [
           { type: 'text', text: result }

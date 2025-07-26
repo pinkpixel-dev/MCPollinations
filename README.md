@@ -82,6 +82,8 @@ node /path/to/MCPollinations/generate-mcp-config.js
 
 2. Follow the prompts to customize your configuration or use the defaults.
    - Set custom output and temporary directories (defaults to relative paths for portability)
+     - **Windows users**: Consider using absolute paths (e.g., `C:\Users\YourName\Pictures\MCPollinations`) for more reliable file saving
+   - **Configure optional authentication** (token and referrer for enhanced access)
    - Configure default parameters for image generation (with a list of available models, dimensions, etc.)
    - Configure default parameters for text generation (with a list of available models)
    - Configure default parameters for audio generation (voice)
@@ -94,6 +96,41 @@ After integration, you can use commands like:
 
 "Generate an image of a sunset over the ocean using MCPollinations"
 
+## Authentication (Optional)
+
+MCPollinations supports optional authentication to provide access to more models and better rate limits. The server works perfectly without authentication (free tier), but users with API tokens can get enhanced access.
+
+### Configuration Methods
+
+**Method 1: Environment Variables (Recommended for security)**
+```bash
+# Set environment variables before running the server
+export POLLINATIONS_TOKEN="your-api-token"
+export POLLINATIONS_REFERRER="https://your-domain.com"
+
+# Then run the server
+npx @pinkpixel/mcpollinations
+```
+
+**Method 2: MCP Configuration File**
+When generating your MCP configuration, you'll be prompted for optional authentication settings:
+```json
+{
+  "mcpollinations": {
+    "auth": {
+      "token": "your-api-token",
+      "referrer": "https://your-domain.com"
+    }
+  }
+}
+```
+
+### Authentication Parameters
+
+- **`token`** (optional): Your Pollinations API token for enhanced access
+- **`referrer`** (optional): Your domain/application referrer URL
+
+Both parameters are completely optional. Leave them empty or unset to use the free tier.
 
 ## Troubleshooting
 
@@ -192,6 +229,8 @@ When using Claude or another application with the MCP server:
 2. If you start the MCP server manually from a specific directory, images will be saved there by default.
 
 3. If Claude Desktop launches the MCP server automatically, images will be saved in Claude Desktop's working directory (typically in an application data folder).
+
+**💡 Windows Users**: For reliable file saving on Windows, use absolute paths in your MCP configuration instead of relative paths (e.g., `C:\Users\YourName\Pictures\MCPollinations` instead of `./mcpollinations-output`). Relative paths may not resolve as expected depending on the working directory context.
 
 ### Finding Your Generated Images
 

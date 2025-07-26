@@ -8,6 +8,10 @@
     "resources": {
       "output_dir": "./mcpollinations-output"
     },
+    "auth": {
+      "token": "",
+      "referrer": ""
+    },
     "default_params": {
       "image": {
         "model": "flux",
