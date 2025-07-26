@@ -86,6 +86,8 @@ import {
 import {
   generateImageUrl,
   generateImage,
+  editImage,
+  generateImageFromReference,
   respondAudio,
   listImageModels,
   listTextModels,
@@ -125,7 +127,7 @@ if (finalAuthConfig) {
 const server = new Server(
   {
     name: '@pinkpixel/mcpollinations',
-    version: '1.1.3',
+    version: '1.2.0',
   },
   {
     capabilities: {
@@ -153,8 +155,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
   if (name === 'generateImageUrl') {
     try {
-      const { prompt, model = 'flux', seed, width = 1024, height = 1024, enhance = true, safe = false } = args;
-      const result = await generateImageUrl(prompt, model, seed, width, height, enhance, safe, finalAuthConfig);
+      const { prompt, model = 'flux', seed, width = 1024, height = 1024, enhance = true, safe = false, transparent = false } = args;
+      const result = await generateImageUrl(prompt, model, seed, width, height, enhance, safe, transparent, finalAuthConfig);
       return {
         content: [
           { type: 'text', text: JSON.stringify(result, null, 2) }
@@ -170,8 +172,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     }
   } else if (name === 'generateImage') {
     try {
-      const { prompt, model = 'flux', seed, width = 1024, height = 1024, enhance = true, safe = false, outputPath = './mcpollinations-output', fileName = '', format = 'png' } = args;
-      const result = await generateImage(prompt, model, seed, width, height, enhance, safe, outputPath, fileName, format, finalAuthConfig);
+      const { prompt, model = 'flux', seed, width = 1024, height = 1024, enhance = true, safe = false, transparent = false, outputPath = './mcpollinations-output', fileName = '', format = 'png' } = args;
+      const result = await generateImage(prompt, model, seed, width, height, enhance, safe, transparent, outputPath, fileName, format, finalAuthConfig);
 
       // Prepare the response content
       const content = [
@@ -308,6 +310,79 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       };
     }
 
+  } else if (name === 'editImage') {
+    try {
+      const { prompt, imageUrl, model = 'gptimage', seed, width = 1024, height = 1024, enhance = true, safe = false, transparent = false, outputPath = './mcpollinations-output', fileName = '', format = 'png' } = args;
+      const result = await editImage(prompt, imageUrl, model, seed, width, height, enhance, safe, transparent, outputPath, fileName, format, finalAuthConfig);
+
+      // Prepare the response content
+      const content = [
+        {
+          type: 'image',
+          data: result.data,
+          mimeType: result.mimeType
+        }
+      ];
+
+      // Prepare the response text
+      let responseText = `Edited image from prompt: "${prompt}"\nInput image: ${imageUrl}\n\nImage metadata: ${JSON.stringify(result.metadata, null, 2)}`;
+
+      // Add file path information if the image was saved to a file
+      if (result.filePath) {
+        responseText += `\n\nImage saved to: ${result.filePath}`;
+      }
+
+      content.push({
+        type: 'text',
+        text: responseText
+      });
+
+      return { content };
+    } catch (error) {
+      return {
+        content: [
+          { type: 'text', text: `Error editing image: ${error.message}` }
+        ],
+        isError: true
+      };
+    }
+
+  } else if (name === 'generateImageFromReference') {
+    try {
+      const { prompt, imageUrl, model = 'gptimage', seed, width = 1024, height = 1024, enhance = true, safe = false, transparent = false, outputPath = './mcpollinations-output', fileName = '', format = 'png' } = args;
+      const result = await generateImageFromReference(prompt, imageUrl, model, seed, width, height, enhance, safe, transparent, outputPath, fileName, format, finalAuthConfig);
+
+      // Prepare the response content
+      const content = [
+        {
+          type: 'image',
+          data: result.data,
+          mimeType: result.mimeType
+        }
+      ];
+
+      // Prepare the response text
+      let responseText = `Generated image from reference: "${prompt}"\nReference image: ${imageUrl}\n\nImage metadata: ${JSON.stringify(result.metadata, null, 2)}`;
+
+      // Add file path information if the image was saved to a file
+      if (result.filePath) {
+        responseText += `\n\nImage saved to: ${result.filePath}`;
+      }
+
+      content.push({
+        type: 'text',
+        text: responseText
+      });
+
+      return { content };
+    } catch (error) {
+      return {
+        content: [
+          { type: 'text', text: `Error generating image from reference: ${error.message}` }
+        ],
+        isError: true
+      };
+    }
 
   } else {
     throw new McpError(

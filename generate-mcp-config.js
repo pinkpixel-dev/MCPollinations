@@ -29,7 +29,8 @@ const defaultConfig = {
         "width": 1024,
         "height": 1024,
         "safe": false,
-        "enhance": true
+        "enhance": true,
+        "transparent": false
       },
       "text": {
         "model": "openai",
@@ -45,6 +46,8 @@ const defaultConfig = {
     "alwaysAllow": [
       "generateImageUrl",
       "generateImage",
+      "editImage",
+      "generateImageFromReference",
       "listImageModels",
       "respondAudio",
       "listAudioVoices",
@@ -149,6 +152,9 @@ async function generateMcpConfig() {
 
       const imageEnhance = await promptYesNo('Enable prompt enhancement using LLM before image generation?', true);
       config[configKey].default_params.image.enhance = imageEnhance;
+
+      const imageTransparent = await promptYesNo('Enable transparent background by default? (gptimage model only, default: false)', false);
+      config[configKey].default_params.image.transparent = imageTransparent;
     }
 
     // Text parameters
@@ -191,6 +197,8 @@ async function generateMcpConfig() {
       const allTools = [
         'generateImageUrl',
         'generateImage',
+        'editImage',
+        'generateImageFromReference',
         'listImageModels',
         'respondAudio',
         'listAudioVoices',

@@ -5,7 +5,7 @@
  */
 
 // Import services
-import { generateImageUrl, generateImage, listImageModels } from './services/imageService.js';
+import { generateImageUrl, generateImage, editImage, generateImageFromReference, listImageModels } from './services/imageService.js';
 import { respondAudio, listAudioVoices } from './services/audioService.js';
 import { respondText, listTextModels } from './services/textService.js';
 
@@ -15,6 +15,8 @@ export {
   // Image services
   generateImageUrl,
   generateImage,
+  editImage,
+  generateImageFromReference,
   listImageModels,
 
   // Audio services

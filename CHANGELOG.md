@@ -5,6 +5,32 @@ All notable changes to the MCPollinations will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - `2025-07-25`
+
+### Added
+- **Transparent Background Support**: Added `transparent` parameter for generating images with transparent backgrounds
+  - Works with `gptimage` model only
+  - Perfect for logos, icons, and graphics that need transparent backgrounds
+  - Added to both `generateImageUrl` and `generateImage` tools
+  - Configurable in MCP configuration with default settings
+- **Image-to-Image Generation**: Two new powerful tools for working with existing images
+  - `editImage` tool: Edit or modify existing images based on text prompts (e.g., "remove the cat and add a dog", "change background to mountains")
+  - `generateImageFromReference` tool: Generate new images using existing images as reference (e.g., "make this into a cartoon", "create a painting version")
+  - Both tools support `gptimage` and `kontext` models
+  - Full parameter support including transparent backgrounds, custom dimensions, and file saving
+- **Enhanced Configuration**: Updated configuration generator and example files
+  - Added transparent parameter configuration prompts
+  - Updated tool lists to include new image-to-image tools
+  - Enhanced model guidance and descriptions
+
+### Changed
+- Updated tool schemas to include new transparent parameter
+- Enhanced image generation capabilities with more flexible model options
+- Improved tool descriptions for better AI assistant understanding
+
+### Fixed
+- Ensured all new tools follow consistent parameter patterns and error handling
+
 ## [1.1.3] - `2025-07-25`
 
 ### Added

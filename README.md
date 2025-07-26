@@ -192,13 +192,18 @@ If it shows a version lower than 16.0.0, consider upgrading for best compatibili
 
 The MCP server provides the following tools:
 
+### **Image Generation Tools**
 1. `generateImageUrl` - Generates an image URL from a text prompt
 2. `generateImage` - Generates an image, returns it as base64-encoded data, and saves it to a file by default (PNG format)
-3. `respondAudio` - Generates an audio response to a text prompt (customizable voice parameter)
-4. `respondText` - Responds with text to a prompt using text models (customizable model parameter)
+3. `editImage` - **NEW!** Edit or modify existing images based on text prompts
+4. `generateImageFromReference` - **NEW!** Generate new images using existing images as reference
 5. `listImageModels` - Lists available models for image generation
-6. `listTextModels` - Lists available models for text generation
-7. `listAudioVoices` - Lists all available voices for audio generation
+
+### **Text & Audio Tools**
+6. `respondText` - Responds with text to a prompt using text models (customizable parameters)
+7. `respondAudio` - Generates an audio response to a text prompt (customizable voice parameter)
+8. `listTextModels` - Lists available models for text generation
+9. `listAudioVoices` - Lists all available voices for audio generation
 
 ## Text Generation Details
 
@@ -244,6 +249,51 @@ In your MCP configuration, you can set defaults:
 }
 ```
 
+## Image-to-Image Generation (NEW!)
+
+MCPollinations now supports powerful image-to-image generation with two specialized tools:
+
+### **editImage Tool**
+Perfect for modifying existing images:
+- **Remove objects**: "remove the cat from this image"
+- **Add elements**: "add a dog to this scene"
+- **Change backgrounds**: "replace the background with mountains"
+- **Style modifications**: "make the lighting more dramatic"
+
+### **generateImageFromReference Tool**
+Perfect for creating variations and new styles:
+- **Style transfer**: "make this photo look like a painting"
+- **Format changes**: "convert this to a cartoon style"
+- **Creative variations**: "create a futuristic version of this"
+- **Artistic interpretations**: "make this look like a sketch"
+
+### **Supported Models**
+- **`gptimage`**: Versatile model for both editing and reference generation
+- **`kontext`**: Specialized model optimized for image-to-image tasks
+
+### **Example Usage**
+```javascript
+// Edit an existing image
+const editResult = await editImage(
+  "change the background to a sunset beach",
+  "https://example.com/photo.jpg",
+  "gptimage"
+);
+
+// Generate from reference
+const referenceResult = await generateImageFromReference(
+  "make this into a watercolor painting",
+  "https://example.com/photo.jpg",
+  "kontext"
+);
+```
+
+### **Transparent Backgrounds (NEW!)**
+Generate images with transparent backgrounds using the `gptimage` model:
+- Perfect for logos, icons, and graphics
+- Set `transparent: true` in your requests
+- Only works with the `gptimage` model
+
 ## Image Generation Details
 
 ### Default Behavior
@@ -272,6 +322,7 @@ const options = {
   seed: 12345,  // Specific seed for reproducibility (defaults to random)
   enhance: true,  // Enhance the prompt using an LLM before generating (defaults to true)
   safe: false,  // Content filtering (defaults to false)
+  transparent: false,  // Generate with transparent background (gptimage model only)
 
   // File saving options
   saveToFile: true,  // Set to false to skip saving to disk

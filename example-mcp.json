@@ -18,7 +18,8 @@
         "width": 1024,
         "height": 1024,
         "safe": false,
-        "enhance": true
+        "enhance": true,
+        "transparent": false
       },
       "text": {
         "model": "openai",
@@ -34,6 +35,8 @@
     "alwaysAllow": [
       "generateImageUrl",
       "generateImage",
+      "editImage",
+      "generateImageFromReference",
       "listImageModels",
       "respondAudio",
       "listAudioVoices",

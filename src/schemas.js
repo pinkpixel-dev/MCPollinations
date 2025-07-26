@@ -2,7 +2,7 @@
  * Central export for all schema definitions
  */
 
-import { generateImageUrlSchema, generateImageSchema, listImageModelsSchema } from './services/imageSchema.js';
+import { generateImageUrlSchema, generateImageSchema, editImageSchema, generateImageFromReferenceSchema, listImageModelsSchema } from './services/imageSchema.js';
 import { respondAudioSchema, listAudioVoicesSchema } from './services/audioSchema.js';
 import { respondTextSchema, listTextModelsSchema } from './services/textSchema.js';
 
@@ -12,6 +12,8 @@ export {
   // Image schemas
   generateImageUrlSchema,
   generateImageSchema,
+  editImageSchema,
+  generateImageFromReferenceSchema,
   listImageModelsSchema,
 
   // Audio schemas
@@ -31,6 +33,8 @@ export function getAllToolSchemas() {
   return [
     generateImageUrlSchema,
     generateImageSchema,
+    editImageSchema,
+    generateImageFromReferenceSchema,
     listImageModelsSchema,
     respondAudioSchema,
     listAudioVoicesSchema,
