@@ -138,7 +138,7 @@ MCPollinations respects your MCP configuration settings as defaults. When you as
 
 - **Your configured models, output directories, and parameters are used automatically**
 - **To override**: Specifically instruct the AI to use different settings
-  - "Generate an image using the gptimage model"
+  - "Generate an image using the kontext model"
   - "Save this image to my Desktop folder"
   - "Use a temperature of 1.2 for this text generation"
 
@@ -268,7 +268,6 @@ Perfect for creating variations and new styles:
 - **Artistic interpretations**: "make this look like a sketch"
 
 ### **Supported Models**
-- **`gptimage`**: Versatile model for both editing and reference generation
 - **`kontext`**: Specialized model optimized for image-to-image tasks
 
 ### **Example Usage**
@@ -277,7 +276,7 @@ Perfect for creating variations and new styles:
 const editResult = await editImage(
   "change the background to a sunset beach",
   "https://example.com/photo.jpg",
-  "gptimage"
+  "kontext"
 );
 
 // Generate from reference
@@ -287,12 +286,6 @@ const referenceResult = await generateImageFromReference(
   "kontext"
 );
 ```
-
-### **Transparent Backgrounds (NEW!)**
-Generate images with transparent backgrounds using the `gptimage` model:
-- Perfect for logos, icons, and graphics
-- Set `transparent: true` in your requests
-- Only works with the `gptimage` model
 
 ## Image Generation Details
 
@@ -322,7 +315,6 @@ const options = {
   seed: 12345,  // Specific seed for reproducibility (defaults to random)
   enhance: true,  // Enhance the prompt using an LLM before generating (defaults to true)
   safe: false,  // Content filtering (defaults to false)
-  transparent: false,  // Generate with transparent background (gptimage model only)
 
   // File saving options
   saveToFile: true,  // Set to false to skip saving to disk

@@ -29,8 +29,7 @@ const defaultConfig = {
         "width": 1024,
         "height": 1024,
         "safe": false,
-        "enhance": true,
-        "transparent": false
+        "enhance": true
       },
       "text": {
         "model": "openai",
@@ -137,7 +136,7 @@ async function generateMcpConfig() {
     const customizeImage = await promptYesNo('Customize image generation parameters?', false);
 
     if (customizeImage) {
-      console.log('Available image models: "flux", "turbo", "gptimage". Use the listImageModels tool to see he most recent model list');
+      console.log('Available image models: "flux", "turbo", "kontext". Use the listImageModels tool to see the most recent model list');
       const imageModel = await prompt('Default image model (default: "flux"): ');
       if (imageModel) config[configKey].default_params.image.model = imageModel;
 
@@ -152,9 +151,6 @@ async function generateMcpConfig() {
 
       const imageEnhance = await promptYesNo('Enable prompt enhancement using LLM before image generation?', true);
       config[configKey].default_params.image.enhance = imageEnhance;
-
-      const imageTransparent = await promptYesNo('Enable transparent background by default? (gptimage model only, default: false)', false);
-      config[configKey].default_params.image.transparent = imageTransparent;
     }
 
     // Text parameters

@@ -127,7 +127,7 @@ if (finalAuthConfig) {
 const server = new Server(
   {
     name: '@pinkpixel/mcpollinations',
-    version: '1.2.0',
+    version: '1.2.1',
   },
   {
     capabilities: {
@@ -155,8 +155,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
   if (name === 'generateImageUrl') {
     try {
-      const { prompt, model = 'flux', seed, width = 1024, height = 1024, enhance = true, safe = false, transparent = false } = args;
-      const result = await generateImageUrl(prompt, model, seed, width, height, enhance, safe, transparent, finalAuthConfig);
+      const { prompt, model = 'flux', seed, width = 1024, height = 1024, enhance = true, safe = false } = args;
+      const result = await generateImageUrl(prompt, model, seed, width, height, enhance, safe, finalAuthConfig);
       return {
         content: [
           { type: 'text', text: JSON.stringify(result, null, 2) }
@@ -172,8 +172,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     }
   } else if (name === 'generateImage') {
     try {
-      const { prompt, model = 'flux', seed, width = 1024, height = 1024, enhance = true, safe = false, transparent = false, outputPath = './mcpollinations-output', fileName = '', format = 'png' } = args;
-      const result = await generateImage(prompt, model, seed, width, height, enhance, safe, transparent, outputPath, fileName, format, finalAuthConfig);
+      const { prompt, model = 'flux', seed, width = 1024, height = 1024, enhance = true, safe = false, outputPath = './mcpollinations-output', fileName = '', format = 'png' } = args;
+      const result = await generateImage(prompt, model, seed, width, height, enhance, safe, outputPath, fileName, format, finalAuthConfig);
 
       // Prepare the response content
       const content = [
@@ -312,8 +312,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
   } else if (name === 'editImage') {
     try {
-      const { prompt, imageUrl, model = 'gptimage', seed, width = 1024, height = 1024, enhance = true, safe = false, transparent = false, outputPath = './mcpollinations-output', fileName = '', format = 'png' } = args;
-      const result = await editImage(prompt, imageUrl, model, seed, width, height, enhance, safe, transparent, outputPath, fileName, format, finalAuthConfig);
+      const { prompt, imageUrl, model = 'kontext', seed, width = 1024, height = 1024, enhance = true, safe = false, outputPath = './mcpollinations-output', fileName = '', format = 'png' } = args;
+      const result = await editImage(prompt, imageUrl, model, seed, width, height, enhance, safe, outputPath, fileName, format, finalAuthConfig);
 
       // Prepare the response content
       const content = [
@@ -349,8 +349,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
   } else if (name === 'generateImageFromReference') {
     try {
-      const { prompt, imageUrl, model = 'gptimage', seed, width = 1024, height = 1024, enhance = true, safe = false, transparent = false, outputPath = './mcpollinations-output', fileName = '', format = 'png' } = args;
-      const result = await generateImageFromReference(prompt, imageUrl, model, seed, width, height, enhance, safe, transparent, outputPath, fileName, format, finalAuthConfig);
+      const { prompt, imageUrl, model = 'kontext', seed, width = 1024, height = 1024, enhance = true, safe = false, outputPath = './mcpollinations-output', fileName = '', format = 'png' } = args;
+      const result = await generateImageFromReference(prompt, imageUrl, model, seed, width, height, enhance, safe, outputPath, fileName, format, finalAuthConfig);
 
       // Prepare the response content
       const content = [

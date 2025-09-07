@@ -38,10 +38,6 @@ export const generateImageUrlSchema = {
       safe: {
         type: 'boolean',
         description: 'Whether to apply content filtering (default: false)'
-      },
-      transparent: {
-        type: 'boolean',
-        description: 'Generate image with transparent background (gptimage model only, default: false)'
       }
     },
     required: ['prompt']
@@ -84,10 +80,6 @@ export const generateImageSchema = {
       safe: {
         type: 'boolean',
         description: 'Whether to apply content filtering (default: false)'
-      },
-      transparent: {
-        type: 'boolean',
-        description: 'Generate image with transparent background (gptimage model only, default: false)'
       },
       outputPath: {
         type: 'string',
@@ -137,7 +129,7 @@ export const editImageSchema = {
       },
       model: {
         type: 'string',
-        description: 'Model name to use for editing (default: user config or "gptimage"). Available: "gptimage", "kontext"'
+        description: 'Model name to use for editing (default: user config or "kontext"). Available: "kontext"'
       },
       seed: {
         type: 'number',
@@ -158,10 +150,6 @@ export const editImageSchema = {
       safe: {
         type: 'boolean',
         description: 'Whether to apply content filtering (default: false)'
-      },
-      transparent: {
-        type: 'boolean',
-        description: 'Generate image with transparent background (gptimage model only, default: false)'
       },
       outputPath: {
         type: 'string',
@@ -199,7 +187,7 @@ export const generateImageFromReferenceSchema = {
       },
       model: {
         type: 'string',
-        description: 'Model name to use for generation (default: user config or "gptimage"). Available: "gptimage", "kontext"'
+        description: 'Model name to use for generation (default: user config or "kontext"). Available: "kontext"'
       },
       seed: {
         type: 'number',
@@ -220,10 +208,6 @@ export const generateImageFromReferenceSchema = {
       safe: {
         type: 'boolean',
         description: 'Whether to apply content filtering (default: false)'
-      },
-      transparent: {
-        type: 'boolean',
-        description: 'Generate image with transparent background (gptimage model only, default: false)'
       },
       outputPath: {
         type: 'string',

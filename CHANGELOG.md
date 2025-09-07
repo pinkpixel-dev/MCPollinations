@@ -5,6 +5,43 @@ All notable changes to the MCPollinations will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - `2025-09-06`
+
+### ⚠️ BREAKING CHANGES
+- **Removed `gptimage` model**: The `gptimage` model is no longer supported by the Pollinations API
+  - All image-to-image operations (editImage, generateImageFromReference) now use `kontext` as the default model
+  - Configuration files and examples have been updated to reflect available models
+- **Removed transparent background support**: Transparent background functionality has been removed
+  - Removed `transparent` parameter from all image generation tools
+  - Updated tool schemas to remove transparent parameter
+  - Removed transparent background configuration options
+  - Documentation updated to remove all references to this feature
+
+### Changed
+- **Image-to-Image Model Defaults**: Updated default models for image-to-image operations
+  - `editImage` tool: Default model changed from 'gptimage' to 'kontext'
+  - `generateImageFromReference` tool: Default model changed from 'gptimage' to 'kontext'
+  - Text-to-image operations continue to use 'flux' as default
+- **Configuration Updates**: Updated all configuration files and generators
+  - `example-mcp.json`: Removed transparent parameter
+  - `generate-mcp-config.js`: Removed transparent configuration prompts and gptimage references
+  - Updated available model lists in configuration generator
+- **Documentation Updates**: Comprehensive documentation cleanup
+  - `README.md`: Removed all references to gptimage model and transparent backgrounds
+  - Updated code examples to use supported models only
+  - Removed deprecated feature sections
+
+### Removed
+- `transparent` parameter from all image generation functions and schemas
+- `gptimage` model references from documentation and configuration files
+- Transparent background configuration prompts
+- Deprecated feature documentation sections
+
+### Migration Guide
+- **For users with existing configurations**: Remove any `transparent` parameters from your MCP configuration files
+- **For image-to-image operations**: Replace any `gptimage` model references with `kontext`
+- **For transparent backgrounds**: This functionality is no longer available - consider using image editing tools as a post-processing step
+
 ## [1.2.0] - `2025-07-25`
 
 ### Added

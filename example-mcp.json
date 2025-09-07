@@ -18,8 +18,7 @@
         "width": 1024,
         "height": 1024,
         "safe": false,
-        "enhance": true,
-        "transparent": false
+        "enhance": true
       },
       "text": {
         "model": "openai",

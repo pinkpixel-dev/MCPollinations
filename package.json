@@ -1,6 +1,6 @@
 {
   "name": "@pinkpixel/mcpollinations",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Model Context Protocol (MCP) server for the Pollinations APIs with image saving functionality.",
   "type": "module",
   "bin": {

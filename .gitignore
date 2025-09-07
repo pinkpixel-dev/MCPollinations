@@ -186,3 +186,6 @@ local.properties
 
 # Generated files
 *.generated.*
+
+# Other
+task-plan.md

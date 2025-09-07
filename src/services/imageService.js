@@ -14,12 +14,11 @@
  * @param {number} [height=1024] - Height of the generated image
  * @param {boolean} [enhance=true] - Whether to enhance the prompt using an LLM before generating
  * @param {boolean} [safe=false] - Whether to apply content filtering
- * @param {boolean} [transparent=false] - Generate image with transparent background (gptimage model only)
  * @param {Object} [authConfig] - Optional authentication configuration {token, referrer}
  * @returns {Object} - Object containing the image URL and metadata
  * @note Always includes nologo=true and private=true parameters
  */
-export async function generateImageUrl(prompt, model = 'flux', seed = Math.floor(Math.random() * 1000000), width = 1024, height = 1024, enhance = true, safe = false, transparent = false, authConfig = null) {
+export async function generateImageUrl(prompt, model = 'flux', seed = Math.floor(Math.random() * 1000000), width = 1024, height = 1024, enhance = true, safe = false, authConfig = null) {
   if (!prompt || typeof prompt !== 'string') {
     throw new Error('Prompt is required and must be a string');
   }
@@ -44,7 +43,6 @@ export async function generateImageUrl(prompt, model = 'flux', seed = Math.floor
   queryParams.append('nologo', 'true'); // Always set nologo to true
   queryParams.append('private', 'true'); // Always set private to true)
   queryParams.append('safe', safe.toString()); // Use the customizable safe parameter
-  if (transparent) queryParams.append('transparent', 'true'); // Add transparent parameter if true
 
   // Construct the URL
   const encodedPrompt = encodeURIComponent(prompt);
@@ -66,8 +64,7 @@ export async function generateImageUrl(prompt, model = 'flux', seed = Math.floor
     enhance,
     private: true,
     nologo: true,
-    safe,
-    transparent
+    safe
   };
 }
 
@@ -82,7 +79,6 @@ export async function generateImageUrl(prompt, model = 'flux', seed = Math.floor
  * @param {number} [height=1024] - Height of the generated image
  * @param {boolean} [enhance=true] - Whether to enhance the prompt using an LLM before generating
  * @param {boolean} [safe=false] - Whether to apply content filtering
- * @param {boolean} [transparent=false] - Generate image with transparent background (gptimage model only)
  * @param {string} [outputPath='./mcpollinations-output'] - Directory path where to save the image
  * @param {string} [fileName] - Name of the file to save (without extension)
  * @param {string} [format='png'] - Image format to save as (png, jpeg, jpg, webp)
@@ -90,13 +86,13 @@ export async function generateImageUrl(prompt, model = 'flux', seed = Math.floor
  * @returns {Promise<Object>} - Object containing the base64 image data, mime type, metadata, and file path if saved
  * @note Always includes nologo=true and private=true parameters
  */
-export async function generateImage(prompt, model = 'flux', seed = Math.floor(Math.random() * 1000000), width = 1024, height = 1024, enhance = true, safe = false, transparent = false, outputPath = './mcpollinations-output', fileName = '', format = 'png', authConfig = null) {
+export async function generateImage(prompt, model = 'flux', seed = Math.floor(Math.random() * 1000000), width = 1024, height = 1024, enhance = true, safe = false, outputPath = './mcpollinations-output', fileName = '', format = 'png', authConfig = null) {
   if (!prompt || typeof prompt !== 'string') {
     throw new Error('Prompt is required and must be a string');
   }
 
   // First, generate the image URL
-  const urlResult = await generateImageUrl(prompt, model, seed, width, height, enhance, safe, transparent, authConfig);
+  const urlResult = await generateImageUrl(prompt, model, seed, width, height, enhance, safe, authConfig);
 
   try {
     // Prepare fetch options with optional auth headers
@@ -140,8 +136,7 @@ export async function generateImage(prompt, model = 'flux', seed = Math.floor(Ma
         enhance: urlResult.enhance,
         private: urlResult.private,
         nologo: urlResult.nologo,
-        safe: urlResult.safe,
-        transparent: urlResult.transparent
+        safe: urlResult.safe
       }
     };
 
@@ -203,13 +198,12 @@ export async function generateImage(prompt, model = 'flux', seed = Math.floor(Ma
  *
  * @param {string} prompt - The text description of how to edit the image
  * @param {string} imageUrl - URL of the input image to edit
- * @param {string} [model='gptimage'] - Model name to use for editing (gptimage or kontext)
+ * @param {string} [model='kontext'] - Model name to use for editing (kontext recommended for image-to-image)
  * @param {number} [seed] - Seed for reproducible results (defaults to random if not specified)
  * @param {number} [width=1024] - Width of the generated image
  * @param {number} [height=1024] - Height of the generated image
  * @param {boolean} [enhance=true] - Whether to enhance the prompt using an LLM before generating
  * @param {boolean} [safe=false] - Whether to apply content filtering
- * @param {boolean} [transparent=false] - Generate image with transparent background (gptimage model only)
  * @param {string} [outputPath='./mcpollinations-output'] - Directory path where to save the image
  * @param {string} [fileName] - Name of the file to save (without extension)
  * @param {string} [format='png'] - Image format to save as (png, jpeg, jpg, webp)
@@ -217,7 +211,7 @@ export async function generateImage(prompt, model = 'flux', seed = Math.floor(Ma
  * @returns {Promise<Object>} - Object containing the base64 image data, mime type, metadata, and file path if saved
  * @note Always includes nologo=true and private=true parameters
  */
-export async function editImage(prompt, imageUrl, model = 'gptimage', seed = Math.floor(Math.random() * 1000000), width = 1024, height = 1024, enhance = true, safe = false, transparent = false, outputPath = './mcpollinations-output', fileName = '', format = 'png', authConfig = null) {
+export async function editImage(prompt, imageUrl, model = 'kontext', seed = Math.floor(Math.random() * 1000000), width = 1024, height = 1024, enhance = true, safe = false, outputPath = './mcpollinations-output', fileName = '', format = 'png', authConfig = null) {
   if (!prompt || typeof prompt !== 'string') {
     throw new Error('Prompt is required and must be a string');
   }
@@ -241,7 +235,6 @@ export async function editImage(prompt, imageUrl, model = 'gptimage', seed = Mat
   queryParams.append('nologo', 'true'); // Always set nologo to true
   queryParams.append('private', 'true'); // Always set private to true)
   queryParams.append('safe', safe.toString()); // Use the customizable safe parameter
-  if (transparent) queryParams.append('transparent', 'true'); // Add transparent parameter if true
 
   // Construct the URL
   const encodedPrompt = encodeURIComponent(prompt);
@@ -295,8 +288,7 @@ export async function editImage(prompt, imageUrl, model = 'gptimage', seed = Mat
         enhance,
         private: true,
         nologo: true,
-        safe,
-        transparent
+        safe
       }
     };
 
@@ -355,13 +347,12 @@ export async function editImage(prompt, imageUrl, model = 'gptimage', seed = Mat
  *
  * @param {string} prompt - The text description of what to generate based on the reference image
  * @param {string} imageUrl - URL of the reference image
- * @param {string} [model='gptimage'] - Model name to use for generation (gptimage or kontext)
+ * @param {string} [model='kontext'] - Model name to use for generation (kontext recommended for image-to-image)
  * @param {number} [seed] - Seed for reproducible results (defaults to random if not specified)
  * @param {number} [width=1024] - Width of the generated image
  * @param {number} [height=1024] - Height of the generated image
  * @param {boolean} [enhance=true] - Whether to enhance the prompt using an LLM before generating
  * @param {boolean} [safe=false] - Whether to apply content filtering
- * @param {boolean} [transparent=false] - Generate image with transparent background (gptimage model only)
  * @param {string} [outputPath='./mcpollinations-output'] - Directory path where to save the image
  * @param {string} [fileName] - Name of the file to save (without extension)
  * @param {string} [format='png'] - Image format to save as (png, jpeg, jpg, webp)
@@ -369,7 +360,7 @@ export async function editImage(prompt, imageUrl, model = 'gptimage', seed = Mat
  * @returns {Promise<Object>} - Object containing the base64 image data, mime type, metadata, and file path if saved
  * @note Always includes nologo=true and private=true parameters
  */
-export async function generateImageFromReference(prompt, imageUrl, model = 'gptimage', seed = Math.floor(Math.random() * 1000000), width = 1024, height = 1024, enhance = true, safe = false, transparent = false, outputPath = './mcpollinations-output', fileName = '', format = 'png', authConfig = null) {
+export async function generateImageFromReference(prompt, imageUrl, model = 'kontext', seed = Math.floor(Math.random() * 1000000), width = 1024, height = 1024, enhance = true, safe = false, outputPath = './mcpollinations-output', fileName = '', format = 'png', authConfig = null) {
   if (!prompt || typeof prompt !== 'string') {
     throw new Error('Prompt is required and must be a string');
   }
@@ -393,7 +384,6 @@ export async function generateImageFromReference(prompt, imageUrl, model = 'gpti
   queryParams.append('nologo', 'true'); // Always set nologo to true
   queryParams.append('private', 'true'); // Always set private to true)
   queryParams.append('safe', safe.toString()); // Use the customizable safe parameter
-  if (transparent) queryParams.append('transparent', 'true'); // Add transparent parameter if true
 
   // Construct the URL
   const encodedPrompt = encodeURIComponent(prompt);
@@ -447,8 +437,7 @@ export async function generateImageFromReference(prompt, imageUrl, model = 'gpti
         enhance,
         private: true,
         nologo: true,
-        safe,
-        transparent
+        safe
       }
     };
 
