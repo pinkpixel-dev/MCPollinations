@@ -1,9 +1,9 @@
-[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/pinkpixel-dev-mcpollinations-badge.png)](https://mseep.ai/app/pinkpixel-dev-mcpollinations)
-
 # MCPollinations Multimodal MCP Server
+A Model Context Protocol (MCP) server that enables AI assistants to generate images, text, and audio through the Pollinations APIs
 
 [![smithery badge](https://smithery.ai/badge/@pinkpixel-dev/mcpollinations)](https://smithery.ai/server/@pinkpixel-dev/mcpollinations)
-A Model Context Protocol (MCP) server that enables AI assistants to generate images, text, and audio through the Pollinations APIs
+
+[![Verified on MseeP](https://mseep.ai/badge.svg)](https://mseep.ai/app/8448e4ec-c863-476a-8adb-aed3cf16ea2b)
 
 ## Features
 
