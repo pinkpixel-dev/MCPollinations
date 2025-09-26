@@ -1,0 +1,295 @@
+Below is what the current codebase actually reveals about the two new image models (nanobanana and seedream) and how to use them. I’m only relying on the code fragments we surfaced; where something is not present or is truncated I’ll flag it instead of hand‑waving.
+
+---
+
+## 1. Model Registration / Capabilities
+
+From `image.pollinations.ai/src/models.ts`:
+
+- nanobanana  
+  - type: "vertex-ai" (Gemini 2.5 Flash Image Preview bridge)  
+  - enhance: false  
+  - maxSideLength: 1024  
+  - tier: "seed"
+
+- seedream  
+  - type: "seedream" (ByteDance ARK Seedream API)  
+  - enhance: false  
+  - maxSideLength: 2048 (comment says supports up to 4K; internal logic supports 1K / 2K / 4K sizing strings)  
+  - tier: "seed"
+
+Access control: In `createAndReturnImages.ts` seedream explicitly checks a user tier (must be seed tier or higher) and throws an auth error otherwise. nanobanana will also require at least “seed” (tier set in config) even though the explicit auth check snippet we saw was only for seedream.
+
+---
+
+## 2. Image Input (Reference / Editing) Support
+
+From `pollinations.ai/src/config/imageModels.js`:
+
+```js
+export const IMAGE_MODELS_WITH_REFERENCE_SUPPORT = [
+  "nanobanana",
+  "seedream",
+  "kontext",
+];
+export const MAX_REFERENCE_IMAGES = 4;
+```
+
+Implications:
+
+- Both nanobanana and seedream are recognized as accepting image input (i.e. image-to-image / reference images) at the application layer.
+- The UI/config level currently caps references at 4.
+- HOWEVER: The seedream backend code allows more.
+
+Seedream backend (`seedreamModel.ts`) logic:
+
+```ts
+const imageUrls = Array.isArray(safeParams.image)
+  ? safeParams.image.slice(0, 10) // Limit to max 10 images
+  : [safeParams.image];
+requestBody.image = imageUrls.length === 1 ? imageUrls[0] : imageUrls;
+```
+
+So:
+- Seedream internally accepts up to 10 reference images (hard slice to 10).
+- There is a mismatch: frontend/exported constant = 4, backend capacity = 10. If you control a direct (possibly undocumented) POST/JSON path, you may be able to supply more than 4 (up to 10). Through standard URL tooling/UI you’ll likely be constrained to 4 unless you bypass that layer.
+
+nanobanana:
+- We did not surface the detailed implementation body for `processNanobananaRequest` in `vertexAIImageGenerator.ts` (only its signature), so we did not see the explicit limit enforcement. Given it’s listed in `IMAGE_MODELS_WITH_REFERENCE_SUPPORT`, it definitely supports at least one reference image; probable limit aligns with `MAX_REFERENCE_IMAGES` (4) unless the Vertex AI adapter adds its own cap. (Gemini image editing endpoints generally accept 1–N images; code not shown here prevents me from asserting an internal higher limit.)
+
+---
+
+## 3. Parameter Handling (Shared)
+
+General parameter schema is defined in `image.pollinations.ai/src/params.ts` (truncated in search results but enough to see style):
+
+- seed (integer; sanitized; default fallback 42)
+- width / height (integers; optional; used to compute size / side length)
+- maxSideLength (model-specific cap)
+- Boolean-like params sanitized from strings ("true"/"false")
+- There is a `safeParams.image` which can be a string or array (used by seedream logic).
+
+From persona / example URL (`text.pollinations.ai/personas/unity.js`) we see the canonical query pattern:
+
+```
+https://image.pollinations.ai/prompt/{description}?width={w}&height={h}&seed={seed}&private=true&enhance=true&model=flux&safe=false&nologo=true
+```
+
+So generally the public GET style includes:
+- prompt (path segment, URL encoded)
+- width / height
+- seed
+- model
+- enhance (boolean)
+- safe (boolean)
+- nologo (boolean)
+- private (boolean)
+- (For reference images) likely `image=` (not shown in truncated `getImageURL.js`, but seedream/nanobanana read `safeParams.image` so expect either repeated `image=` query params or a POST/JSON body field.)
+
+---
+
+## 4. Seedream Specifics
+
+From `seedreamModel.ts`:
+
+Request body base:
+
+```ts
+{
+  model: "seedream-4-0-250828",
+  prompt,
+  sequential_image_generation: "disabled",
+  response_format: "url",
+  size: sizeParam,
+  stream: false,
+  watermark: false,
+  image: (string | string[])  // only if references provided
+}
+```
+
+Size selection logic:
+
+1. If both `safeParams.width` and `safeParams.height` supplied: size = `${width}x${height}` (exact pixel dimensions override resolution strings).
+2. Else it estimates total pixels (defaults to 2048 * 2048 if unspecified) and maps:
+   - ≤ 1024*1024 → "1K"
+   - ≤ 2048*2048 → "2K"
+   - else → "4K"
+
+Reference images:
+- If `safeParams.image` present:
+  - Accepts 1..10 URLs (slice to 10).
+  - Single image becomes a string; multiple becomes an array.
+  - Logging explicitly notes the count.
+
+Downloading output:
+- After successful API response, it validates `data.data[0].url` and then does a second fetch to download the image (so latency includes a second hop).
+- Timeouts:
+  - Generation POST: 60s
+  - Image download: 30s
+- No streaming (stream: false).
+
+Error handling:
+- Non-OK status: throws with full text body included.
+- Missing URL: explicit error.
+
+Auth:
+- Requires `SEEDREAM_API_KEY` env var server-side.
+- Requires user tier >= seed (gated earlier in `createAndReturnImages.ts`).
+
+Important nuance:
+- The internal model string is versioned (`seedream-4-0-250828`). If you hardcode external `model=seedream` in the public API, server maps it to that internal version; version rev bumps will be transparent unless they change request fields (watch commits).
+
+---
+
+## 5. Nanobanana Specifics
+
+From `models.ts` & `vertexAIImageGenerator.ts`:
+
+- Internal logic is in a function `processNanobananaRequest(prompt, safeParams)` inside `vertexAIImageGenerator.ts` (body truncated in results).
+- Type is `vertex-ai` meaning it uses Google Vertex AI Gemini (comment: “Gemini 2.5 Flash Image Preview”).
+- maxSideLength: 1024 (so any supplied width/height beyond 1024 likely gets clamped or rejected in the omitted code).
+- enhance: false (so passing `enhance=true` probably does nothing for this model; consider not setting enhance for nanobanana to avoid confusion).
+- Potential transparent image handling: the function return type includes `transparentImage?`, implying the adapter may optionally return a cutout/alpha image when editing, or uses a transparent placeholder for object isolation workflows (the naming suggests advanced edit flows, but code to confirm is not in our surfaced lines).
+- We do NOT have direct evidence of max reference image count for nanobanana beyond the shared config constant (4). Absent contrary backend code, assume limit 4.
+
+Because of truncated code we cannot confirm:
+- Whether nanobanana supports multiple reference images simultaneously or only 1 for edit + 1 for target (some Gemini endpoints differentiate). The shared constant grouping strongly implies multi-image, but treat >1 as experimental until verified by response success.
+
+---
+
+## 6. Practical Usage Patterns
+
+### A. Basic Text-to-Image (GET style)
+```
+https://image.pollinations.ai/prompt/A%20hyperrealistic%20portrait%20of%20a%20snow%20leopard%20at%20dawn?model=seedream&width=2048&height=2048&seed=123456&nologo=true&safe=false
+```
+(For nanobanana, swap `model=nanobanana` and keep width/height ≤ 1024.)
+
+### B. Image-to-Image (Seedream) – JSON POST (inferred from server internals)
+
+Endpoint (inferred typical pattern): `POST https://image.pollinations.ai/images` or similar internal route that triggers `createAndReturnImages` (exact route not surfaced; if current usage has only GET, the server might also parse query params).
+
+Body shape (based on `seedreamModel.ts`):
+```json
+{
+  "model": "seedream",
+  "prompt": "Refine the composition: more diffused morning light and cinematic depth of field",
+  "image": [
+    "https://example.com/base1.png",
+    "https://example.com/base2.png"
+  ],
+  "width": 2048,
+  "height": 2048,
+  "seed": 987654
+}
+```
+Server will translate `"model": "seedream"` to the versioned `seedream-4-0-250828` internally.
+
+If you exceed 10 images the server silently truncates to first 10.
+
+### C. Image-to-Image (Seedream) – GET style (likely)
+Repeat `image` query param:
+```
+https://image.pollinations.ai/prompt/Improve%20lighting?model=seedream&image=https://.../base1.png&image=https://.../base2.png&width=2048&height=2048
+```
+(This pattern is consistent with how many similar Pollinations model adapters handle arrays. Not directly shown, but consistent with safeParams.image reading after parameter normalization.)
+
+### D. Image Editing (Nanobanana)
+Because we lack the body of `processNanobananaRequest`, safest approach:
+- Start with a single `image=` param.
+- Keep width/height within 1024 cap.
+- Provide a concise yet descriptive prompt.
+- If multi-reference works, layer additional `image=` parameters (up to 4) and observe output difference; if ignored or errored, fall back to single.
+
+Example:
+```
+https://image.pollinations.ai/prompt/Add%20a%20golden%20hour%20sunset%20and%20soft%20volumetric%20light?model=nanobanana&image=https://.../original.png&width=1024&height=768
+```
+
+---
+
+## 7. Size / Resolution Strategy
+
+Seedream:
+- If you specify both width & height, those values pass through (subject to any upstream `maxSideLength` checks).
+- If you omit them, the system chooses 1K / 2K / 4K based on (width||2048)*(height||2048). Meaning: omitting width/height effectively defaults to 2048x2048 (→ "2K") unless internal logic sets explicit dimensions elsewhere.
+- For true 4K (e.g. 4096x4096 or large aspect sum), explicitly set large width/height or allow total pixels > 2048².
+
+Nanobanana:
+- Hard cap of 1024 side length. If you send bigger, expect clamp or rejection (not visible, but maxSideLength suggests clamping logic).
+
+---
+
+## 8. Known / Potential Pitfalls
+
+| Area | Risk | Mitigation |
+|------|------|------------|
+| Seedream reference image count | Frontend limit (4) lower than backend (10) | If you control direct API calls, test >4; else file an issue or PR to raise `MAX_REFERENCE_IMAGES` |
+| Nanobanana multi-image support | Implementation details truncated | Probe incrementally; log response headers/status; treat failures as single-image constraint |
+| Silent truncation | Seedream slices to 10 without warning | If depending on ordering, ensure most important refs are first |
+| Tier gating | Seedream requires seed tier | Handle 403/401 & surface a descriptive error in your client |
+| Versioned internal model name | Upgrades may happen | Don’t hardcode internal ID; keep using public `model=seedream` |
+| Width/height + size interplay | For seedream, giving only one dimension not shown | Always send both width & height for deterministic size |
+
+---
+
+## 9. Recommended Client Logic (Pseudo)
+
+```ts
+function buildImageUrl({
+  prompt,
+  model,
+  seed,
+  width,
+  height,
+  images = []
+}) {
+  const base = 'https://image.pollinations.ai/prompt/' +
+               encodeURIComponent(prompt);
+  const params = new URLSearchParams();
+  if (model) params.set('model', model);
+  if (seed) params.set('seed', String(seed));
+  if (width) params.set('width', String(width));
+  if (height) params.set('height', String(height));
+  // Only attach reference images if model supports it
+  if (['nanobanana', 'seedream'].includes(model) && images.length) {
+    images.forEach(img => params.append('image', img));
+  }
+  // Optional flags
+  params.set('nologo', 'true');
+  params.set('safe', 'false');
+  return `${base}?${params.toString()}`;
+}
+```
+
+For seedream >4 references (your advanced path):
+- Use a JSON POST if the GET path enforces the 4-image UI cap (depending on gateway). If POST not yet exposed publicly, you might still be stuck at 4 until config updated.
+
+---
+
+## 10. What We Do NOT Yet Have (Because of Truncated/Unreturned Code)
+
+- Exact nanobanana reference-image limit enforcement body.
+- Exact public POST endpoint path (if any) for seedream/nanobanana (we inferred structure from internal call).
+- Definitive query parameter name for reference images from `getImageURL.js` (almost certainly `image` given code style, but the file body was truncated).
+
+If you need those specifics, next step would be to surface the bodies of:
+- `vertexAIImageGenerator.ts` (full)
+- `getImageURL.js`
+- The router/controller that maps HTTP request → `createAndReturnImages.ts`
+
+---
+
+## 11. Quick Summary Cheat Sheet
+
+- Models: nanobanana (Vertex/Gemini, ≤1024 side), seedream (ByteDance ARK, up to 4K).
+- Auth tier: both labeled seed; seedream explicitly enforces.
+- Reference images: both supported. UI limit 4. Seedream backend limit 10. Nanobanana backend limit unknown (assume 4).
+- Seedream sizes: width+height → exact; else auto 1K / 2K / 4K.
+- Seed parameter: standard integer; consistent behavior across models.
+- Typical URL params: width, height, seed, model, (image*), nologo, safe, enhance, private.
+- Seedream request body (internal) adds: `sequential_image_generation`, `response_format=url`, `stream=false`, `watermark=false`.
+
+---
+
+If you want, I can next pull the missing files to lock down the nanobanana multi-image behavior or locate the exact public POST route—just say so. Let me know what piece you want clarified or tested first.
