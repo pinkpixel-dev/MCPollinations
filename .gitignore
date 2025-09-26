@@ -13,9 +13,9 @@ mcpollinations-temp/
 testing-pictures/
 test-output/
 
-# Development files
-test-image-save.js
-test-list-tools.js
+# Development and test files
+dev/
+tests/
 
 # Environment variables
 .env
