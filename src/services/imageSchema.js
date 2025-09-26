@@ -128,7 +128,7 @@ export const editImageSchema = {
           { type: 'string' },
           { type: 'array', items: { type: 'string' } }
         ],
-        description: 'URL of the input image to edit. Accepts a string or an array for multiple references (first is most important).'
+        description: 'Public HTTP(S) URL(s) of the input image(s) to edit. Accepts a string or an array for multiple references (first is most important). Local file paths, file uploads, or base64/data URLs are not supported.'
       },
       model: {
         type: 'string',
@@ -189,7 +189,7 @@ export const generateImageFromReferenceSchema = {
           { type: 'string' },
           { type: 'array', items: { type: 'string' } }
         ],
-        description: 'URL(s) of reference images. Accepts a string or an array for multi-reference (comma-joined).'
+        description: 'Public HTTP(S) URL(s) of reference images. Accepts a string or an array for multi-reference. Local file paths, file uploads, or base64/data URLs are not supported.'
       },
       model: {
         type: 'string',

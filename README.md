@@ -303,6 +303,8 @@ Perfect for creating variations and new styles:
 
 Multi-reference images: `editImage` and `generateImageFromReference` accept `imageUrl` as a single URL or an array of URLs. The server encodes arrays as the comma-separated `image` parameter used by the API. Ordering matters; kontext uses only the first image, nanobanana is safe up to ~4 refs, and seedream supports up to 10.
 
+Important: URLs only. The image-to-image tools require publicly accessible HTTP(S) URLs. Local file paths, file uploads, and base64/data URLs are not supported by this MCP server (it does not upload files). If you need to work from a local image, host it somewhere accessible (e.g., a temporary file host, object storage, or a raw link in a repo) and pass the URL.
+
 ### **Example Usage**
 ```javascript
 // Edit an existing image

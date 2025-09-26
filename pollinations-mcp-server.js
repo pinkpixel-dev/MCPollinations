@@ -177,7 +177,7 @@ log('Default params:', {
 const server = new Server(
   {
     name: '@pinkpixel/mcpollinations',
-    version: '1.3.0',
+    version: '1.3.1',
   },
   {
     capabilities: {

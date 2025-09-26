@@ -224,15 +224,20 @@ export async function editImage(prompt, imageUrl, model = 'kontext', seed = Math
     throw new Error('Image URL(s) are required and must be a string or array of strings');
   }
 
-  // Support multi-reference images using comma-separated encoding expected by API
-  const imageParam = Array.isArray(imageUrl)
-    ? imageUrl.filter(Boolean).join(',')
-    : imageUrl;
+  // Support multi-reference images. Prefer repeating the `image` param per URL
+  // to avoid comma-encoding ambiguities.
+  const imageList = Array.isArray(imageUrl)
+    ? imageUrl.filter(Boolean)
+    : (typeof imageUrl === 'string' && imageUrl.includes(','))
+      ? imageUrl.split(',').map(s => s.trim()).filter(Boolean)
+      : [imageUrl];
 
   // Build the query parameters
   const queryParams = new URLSearchParams();
   queryParams.append('model', model);
-  queryParams.append('image', imageParam); // Add one or more input image URLs
+  for (const u of imageList) {
+    queryParams.append('image', u);
+  }
   if (seed !== undefined) queryParams.append('seed', seed);
   if (width !== 1024) queryParams.append('width', width);
   if (height !== 1024) queryParams.append('height', height);
@@ -378,14 +383,18 @@ export async function generateImageFromReference(prompt, imageUrl, model = 'kont
     throw new Error('Reference image URL(s) are required and must be a string or array of strings');
   }
 
-  const imageParam = Array.isArray(imageUrl)
-    ? imageUrl.filter(Boolean).join(',')
-    : imageUrl;
+  const imageList = Array.isArray(imageUrl)
+    ? imageUrl.filter(Boolean)
+    : (typeof imageUrl === 'string' && imageUrl.includes(','))
+      ? imageUrl.split(',').map(s => s.trim()).filter(Boolean)
+      : [imageUrl];
 
   // Build the query parameters
   const queryParams = new URLSearchParams();
   queryParams.append('model', model);
-  queryParams.append('image', imageParam); // Add one or more reference image URLs
+  for (const u of imageList) {
+    queryParams.append('image', u);
+  }
   if (seed !== undefined) queryParams.append('seed', seed);
   if (width !== 1024) queryParams.append('width', width);
   if (height !== 1024) queryParams.append('height', height);

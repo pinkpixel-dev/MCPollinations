@@ -217,3 +217,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Notes
 - Model behavior details for `kontext`, `nanobanana`, and `seedream` are documented in `new_models_integration.md`. `kontext` uses only the first reference; `nanobanana` is safe up to ~4 refs; `seedream` up to 10.
+## [1.3.1] - `2025-09-26`
+
+### Fixed
+- Image-to-image query construction for kontext, nanobanana, and seedream:
+  - Now sends multiple reference images as repeated `image` parameters instead of a single comma-encoded string. This matches the API examples and fixes 400/403 errors some users saw when passing multiple references.
+  - Continues to accept a single URL or a comma-separated string; comma strings are split and sent as repeated params.
