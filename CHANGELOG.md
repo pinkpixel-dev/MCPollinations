@@ -196,3 +196,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Initial public release.
+## [1.3.0] - `2025-09-26`
+
+### Added
+- Multi-reference image support for new models:
+  - `editImage` and `generateImageFromReference` now accept `imageUrl` as a string or an array of URLs. Arrays are encoded as the API’s comma-separated `image` parameter.
+- Environment-driven defaults used when tool calls omit arguments:
+  - Image: `IMAGE_MODEL`, `IMAGE_WIDTH`, `IMAGE_HEIGHT`, `IMAGE_ENHANCE`, `IMAGE_SAFE`
+  - Text: `TEXT_MODEL`, `TEXT_TEMPERATURE`, `TEXT_TOP_P`, `TEXT_SYSTEM`
+  - Audio: `AUDIO_VOICE`
+  - Files: `OUTPUT_DIR`
+
+### Changed
+- Authentication loading recognizes both `token`/`referrer` (lowercase) and `POLLINATIONS_TOKEN`/`POLLINATIONS_REFERRER` (uppercase) from env, matching MCP client configs that pass simple keys.
+- Configuration generator now outputs an `env`-only MCP config. Removed legacy `resources`, `disabled`, and `alwaysAllow` blocks to align with typical MCP client expectations.
+- Example configuration and docs updated to use `env` for auth and defaults.
+
+### Fixed
+- Ensured server respects user defaults from env across all tools, so user’s configuration is always honored unless explicitly overridden in a request.
+
+### Notes
+- Model behavior details for `kontext`, `nanobanana`, and `seedream` are documented in `new_models_integration.md`. `kontext` uses only the first reference; `nanobanana` is safe up to ~4 refs; `seedream` up to 10.

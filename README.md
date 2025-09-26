@@ -78,14 +78,41 @@ npx @pinkpixel/mcpollinations generate-config
 node /path/to/MCPollinations/generate-mcp-config.js
 ```
 
+### Quick MCP Config (env)
+If you prefer to skip the generator, copy this into your MCP client config:
+
+```json
+{
+  "mcpollinations": {
+    "command": "npx",
+    "args": ["-y", "@pinkpixel/mcpollinations"],
+    "env": {
+      "token": "YOUR_TOKEN_OPTIONAL",
+      "referrer": "your-app-or-domain-optional",
+      "IMAGE_MODEL": "flux",
+      "IMAGE_WIDTH": "1024",
+      "IMAGE_HEIGHT": "1024",
+      "IMAGE_ENHANCE": "true",
+      "IMAGE_SAFE": "false",
+      "TEXT_MODEL": "openai",
+      "TEXT_TEMPERATURE": "0.7",
+      "TEXT_TOP_P": "0.9",
+      "TEXT_SYSTEM": "",
+      "AUDIO_VOICE": "alloy",
+      "OUTPUT_DIR": "./mcpollinations-output"
+    }
+  }
+}
+```
+
 2. Follow the prompts to customize your configuration or use the defaults.
-   - Set custom output and temporary directories (defaults to relative paths for portability)
+   - Set an output directory (relative paths recommended for portability)
      - **Windows users**: Consider using absolute paths (e.g., `C:\Users\YourName\Pictures\MCPollinations`) for more reliable file saving
-   - **Configure optional authentication** (token and referrer for enhanced access)
+   - Configure optional authentication (token, referrer) under `env`
    - Configure default parameters for image generation (with a list of available models, dimensions, etc.)
    - Configure default parameters for text generation (with a list of available models)
    - Configure default parameters for audio generation (voice)
-   - Specify which tools should be allowed
+
 
 3. Copy the generated `mcp.json` file to your application's MCP settings .json file.
 4. Restart your application.
@@ -110,18 +137,22 @@ export POLLINATIONS_REFERRER="https://your-domain.com"
 npx @pinkpixel/mcpollinations
 ```
 
-**Method 2: MCP Configuration File**
-When generating your MCP configuration, you'll be prompted for optional authentication settings:
+**Method 2: MCP Configuration File (env)**
+When generating your MCP configuration, place auth inside `env` so your MCP client passes them as environment variables to the server process:
 ```json
 {
   "mcpollinations": {
-    "auth": {
+    "command": "npx",
+    "args": ["-y", "@pinkpixel/mcpollinations"],
+    "env": {
       "token": "your-api-token",
-      "referrer": "https://your-domain.com"
+      "referrer": "your-app-or-domain"
     }
   }
 }
 ```
+
+You can also provide `POLLINATIONS_TOKEN` and `POLLINATIONS_REFERRER` instead; the server recognizes both forms. Using `token` and `referrer` inside `env` is recommended for MCP configs.
 
 ### Authentication Parameters
 
@@ -132,7 +163,7 @@ Both parameters are completely optional. Leave them empty or unset to use the fr
 
 ## Using Your Configuration Settings
 
-MCPollinations respects your MCP configuration settings as defaults. When you ask an AI assistant to generate content:
+MCPollinations respects your MCP configuration settings placed in `env` as defaults. When you ask an AI assistant to generate content:
 
 - **Your configured models, output directories, and parameters are used automatically**
 - **To override**: Specifically instruct the AI to use different settings
@@ -232,16 +263,16 @@ const options = {
 
 ### Configuration Examples
 
-In your MCP configuration, you can set defaults:
+In your MCP configuration, set defaults under `env` so the server uses them automatically:
 
 ```json
 {
-  "default_params": {
-    "text": {
-      "model": "openai",
-      "temperature": 0.7,
-      "top_p": 0.9,
-      "system": "You are a helpful coding assistant."
+  "mcpollinations": {
+    "env": {
+      "TEXT_MODEL": "openai",
+      "TEXT_TEMPERATURE": "0.7",
+      "TEXT_TOP_P": "0.9",
+      "TEXT_SYSTEM": "You are a helpful coding assistant."
     }
   }
 }
@@ -269,6 +300,8 @@ Perfect for creating variations and new styles:
 - **`kontext`**: Specialized model optimized for image-to-image tasks
 - **`nanobanana`**: New Google model supporting both text-to-image and image-to-image generation
 - **`seedream`**: New ByteDance model supporting both text-to-image and image-to-image generation
+
+Multi-reference images: `editImage` and `generateImageFromReference` accept `imageUrl` as a single URL or an array of URLs. The server encodes arrays as the comma-separated `image` parameter used by the API. Ordering matters; kontext uses only the first image, nanobanana is safe up to ~4 refs, and seedream supports up to 10.
 
 ### **Example Usage**
 ```javascript
@@ -378,4 +411,3 @@ npm install @pinkpixel/mcpollinations
 # Import in your code
 import { generateImageUrl, generateImage, repsondText, respondAudio, listTextModels, listImageModels, listAudioVoices } from '@pinkpixel/mcpollinations';
 ```
-

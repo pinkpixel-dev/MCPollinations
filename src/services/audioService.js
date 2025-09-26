@@ -4,6 +4,9 @@
  * Functions for interacting with the Pollinations Audio API
  */
 
+const DEBUG = /^(1|true|yes)$/i.test(process.env.DEBUG || process.env.MCP_DEBUG || '');
+const log = (...args) => { if (DEBUG) { try { console.error(...args); } catch {} } };
+
 /**
  * Generates an audio response to a text prompt using the Pollinations Text API
  *
@@ -82,7 +85,7 @@ export async function respondAudio(prompt, voice = "alloy", seed, voiceInstructi
       }
     };
   } catch (error) {
-    console.error('Error generating audio:', error);
+    log('Error generating audio:', error);
     throw error;
   }
 }

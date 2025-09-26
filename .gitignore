@@ -10,9 +10,10 @@ out/
 # Generated image directories
 mcpollinations-output/
 mcpollinations-temp/
+testing-pictures/
+test-output/
 
 # Development files
-OVERVIEW.md 
 test-image-save.js
 test-list-tools.js
 
@@ -186,6 +187,3 @@ local.properties
 
 # Generated files
 *.generated.*
-
-# Other
-task-plan.md

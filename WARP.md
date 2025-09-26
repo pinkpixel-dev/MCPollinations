@@ -48,13 +48,13 @@ MCPollinations is a **Model Context Protocol (MCP) server** that provides AI ima
 
 **Configuration Generator (`generate-mcp-config.js`)**
 - Interactive CLI tool for creating MCP client configurations
-- Supports customization of default parameters, authentication, and tool restrictions
+- Outputs an env-only config. Supports customization of default parameters and authentication.
 
 ### Key Architectural Patterns
 
 **Service-Schema Pairing**: Each service module has a corresponding schema module that defines the MCP tool interface, ensuring consistency between implementation and API contract.
 
-**Authentication Strategy**: Optional token-based auth via environment variables (`POLLINATIONS_TOKEN`, `POLLINATIONS_REFERRER`) with graceful fallback to free tier.
+**Authentication Strategy**: Optional token-based auth via environment variables. Preferred: `token`, `referrer` (from MCP `env`); also accepted: `POLLINATIONS_TOKEN`, `POLLINATIONS_REFERRER`. Graceful fallback to free tier.
 
 **File Management**: Automatic directory creation, unique filename generation with collision handling, and configurable output paths for generated content.
 

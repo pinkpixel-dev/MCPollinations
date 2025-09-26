@@ -1,18 +1,22 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
   "name": "@pinkpixel/mcpollinations",
-  "version": "1.2.2",
+  "version": "1.3.0",
   "description": "Model Context Protocol (MCP) server for the Pollinations APIs with image saving functionality.",
+  "license": "MIT",
   "type": "module",
   "bin": {
     "mcpollinations": "pollinations-mcp-server.js"
   },
   "author": "pinkpixel",
   "email": "admin@pinkpixel.dev",
-  "license": "MIT",
+  "contributors": [
+    "Jessica Doering <https://github.com/sizzlebop>"
+  ],
+  "homepage": "https://www.npmjs.com/package/@pinkpixel/mcpollinations",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pinkpixel-dev/mcpollinations.git"
+    "url": "https://github.com/pinkpixel-dev/mcpollinations"
   },
   "files": [
     "src/**/*",
@@ -29,12 +33,23 @@
     "generate-config": "node generate-mcp-config.js"
   },
   "keywords": [
-    "pollinations",
     "ai",
+    "audio",
+    "chat",
+    "claude",
     "image",
     "generation",
+    "llm",
     "model-context-protocol",
-    "mcp"
+    "mcp",
+    "mcpollinations",
+    "pollinations",
+    "mcp-server",
+    "text",
+    "text-to-image",
+    "text-to-audio",
+    "image-to-image",
+    "tools"
   ],
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.18.2",

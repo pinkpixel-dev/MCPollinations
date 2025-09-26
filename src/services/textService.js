@@ -4,6 +4,9 @@
  * Functions for interacting with the Pollinations Text API
  */
 
+const DEBUG = /^(1|true|yes)$/i.test(process.env.DEBUG || process.env.MCP_DEBUG || '');
+const log = (...args) => { if (DEBUG) { try { console.error(...args); } catch {} } };
+
 /**
  * Responds with text to a prompt using the Pollinations Text API
  *
@@ -69,7 +72,7 @@ export async function respondText(prompt, model = "openai", seed = Math.floor(Ma
 
     return textResponse;
   } catch (error) {
-    console.error('Error generating text:', error);
+    log('Error generating text:', error);
     throw error;
   }
 }
@@ -90,7 +93,7 @@ export async function listTextModels() {
     const models = await response.json();
     return { models };
   } catch (error) {
-    console.error('Error listing text models:', error);
+    log('Error listing text models:', error);
     throw error;
   }
 }

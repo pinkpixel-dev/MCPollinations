@@ -3,44 +3,26 @@
     "command": "npx",
     "args": [
       "-y",
-      "@pinkpixel/mcpollinations"
+      "@pinkpixel/mcpollinations@latest"
     ],
-    "resources": {
-      "output_dir": "./mcpollinations-output"
-    },
-    "auth": {
+    "env": {
       "token": "",
-      "referrer": ""
-    },
-    "default_params": {
-      "image": {
-        "model": "flux",
-        "width": 1024,
-        "height": 1024,
-        "safe": false,
-        "enhance": true
-      },
-      "text": {
-        "model": "openai",
-        "temperature": 0.7,
-        "top_p": 0.9,
-        "system": ""
-      },
-      "audio": {
-        "voice": "alloy"
-      }
-    },
-    "disabled": false,
-    "alwaysAllow": [
-      "generateImageUrl",
-      "generateImage",
-      "editImage",
-      "generateImageFromReference",
-      "listImageModels",
-      "respondAudio",
-      "listAudioVoices",
-      "respondText",
-      "listTextModels"
-    ]
+      "referrer": "",
+
+      "IMAGE_MODEL": "flux",
+      "IMAGE_WIDTH": "1024",
+      "IMAGE_HEIGHT": "1024",
+      "IMAGE_SAFE": "false",
+      "IMAGE_ENHANCE": "true",
+
+      "TEXT_MODEL": "openai",
+      "TEXT_TEMPERATURE": "0.7",
+      "TEXT_TOP_P": "0.9",
+      "TEXT_SYSTEM": "your_system_prompt_here",
+
+      "AUDIO_VOICE": "alloy",
+
+      "OUTPUT_DIR": "./mcpollinations-output"
+    }
   }
 }

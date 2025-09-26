@@ -4,6 +4,10 @@
  * Functions for interacting with the Pollinations Image API
  */
 
+const DEBUG = /^(1|true|yes)$/i.test(process.env.DEBUG || process.env.MCP_DEBUG || '');
+const log = (...args) => { if (DEBUG) { try { console.error(...args); } catch {} } };
+const warn = (...args) => { if (DEBUG) { try { console.warn(...args); } catch {} } };
+
 /**
  * Generates an image URL from a text prompt using the Pollinations Image API
  *
@@ -153,7 +157,7 @@ export async function generateImage(prompt, model = 'flux', seed = Math.floor(Ma
     // Validate the file format
     const validFormats = ['png', 'jpeg', 'jpg', 'webp'];
     if (!validFormats.includes(format)) {
-      console.warn(`Invalid format '${format}', defaulting to 'png'`);
+      warn(`Invalid format '${format}', defaulting to 'png'`);
     }
     const extension = validFormats.includes(format) ? format : 'png';
 
@@ -188,7 +192,7 @@ export async function generateImage(prompt, model = 'flux', seed = Math.floor(Ma
 
     return result;
   } catch (error) {
-    console.error('Error generating image:', error);
+    log('Error generating image:', error);
     throw error;
   }
 }
@@ -216,14 +220,19 @@ export async function editImage(prompt, imageUrl, model = 'kontext', seed = Math
     throw new Error('Prompt is required and must be a string');
   }
 
-  if (!imageUrl || typeof imageUrl !== 'string') {
-    throw new Error('Image URL is required and must be a string');
+  if (!imageUrl || (typeof imageUrl !== 'string' && !Array.isArray(imageUrl))) {
+    throw new Error('Image URL(s) are required and must be a string or array of strings');
   }
+
+  // Support multi-reference images using comma-separated encoding expected by API
+  const imageParam = Array.isArray(imageUrl)
+    ? imageUrl.filter(Boolean).join(',')
+    : imageUrl;
 
   // Build the query parameters
   const queryParams = new URLSearchParams();
   queryParams.append('model', model);
-  queryParams.append('image', imageUrl); // Add the input image URL
+  queryParams.append('image', imageParam); // Add one or more input image URLs
   if (seed !== undefined) queryParams.append('seed', seed);
   if (width !== 1024) queryParams.append('width', width);
   if (height !== 1024) queryParams.append('height', height);
@@ -337,7 +346,7 @@ export async function editImage(prompt, imageUrl, model = 'kontext', seed = Math
     return result;
 
   } catch (error) {
-    console.error('Error editing image:', error);
+    log('Error editing image:', error);
     throw error;
   }
 }
@@ -365,14 +374,18 @@ export async function generateImageFromReference(prompt, imageUrl, model = 'kont
     throw new Error('Prompt is required and must be a string');
   }
 
-  if (!imageUrl || typeof imageUrl !== 'string') {
-    throw new Error('Reference image URL is required and must be a string');
+  if (!imageUrl || (typeof imageUrl !== 'string' && !Array.isArray(imageUrl))) {
+    throw new Error('Reference image URL(s) are required and must be a string or array of strings');
   }
+
+  const imageParam = Array.isArray(imageUrl)
+    ? imageUrl.filter(Boolean).join(',')
+    : imageUrl;
 
   // Build the query parameters
   const queryParams = new URLSearchParams();
   queryParams.append('model', model);
-  queryParams.append('image', imageUrl); // Add the reference image URL
+  queryParams.append('image', imageParam); // Add one or more reference image URLs
   if (seed !== undefined) queryParams.append('seed', seed);
   if (width !== 1024) queryParams.append('width', width);
   if (height !== 1024) queryParams.append('height', height);
@@ -486,7 +499,7 @@ export async function generateImageFromReference(prompt, imageUrl, model = 'kont
     return result;
 
   } catch (error) {
-    console.error('Error generating image from reference:', error);
+    log('Error generating image from reference:', error);
     throw error;
   }
 }
@@ -506,7 +519,7 @@ export async function listImageModels() {
 
     return await response.json();
   } catch (error) {
-    console.error('Error listing image models:', error);
+    log('Error listing image models:', error);
     throw error;
   }
 }

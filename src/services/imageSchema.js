@@ -124,8 +124,11 @@ export const editImageSchema = {
         description: 'The text description of how to edit the image (e.g., "remove the cat and add a dog", "change background to mountains")'
       },
       imageUrl: {
-        type: 'string',
-        description: 'URL of the input image to edit'
+        oneOf: [
+          { type: 'string' },
+          { type: 'array', items: { type: 'string' } }
+        ],
+        description: 'URL of the input image to edit. Accepts a string or an array for multiple references (first is most important).'
       },
       model: {
         type: 'string',
@@ -182,8 +185,11 @@ export const generateImageFromReferenceSchema = {
         description: 'The text description of what to generate based on the reference image (e.g., "create a cartoon version", "make it look like a painting")'
       },
       imageUrl: {
-        type: 'string',
-        description: 'URL of the reference image to base the generation on'
+        oneOf: [
+          { type: 'string' },
+          { type: 'array', items: { type: 'string' } }
+        ],
+        description: 'URL(s) of reference images. Accepts a string or an array for multi-reference (comma-joined).'
       },
       model: {
         type: 'string',

@@ -8,7 +8,7 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
-// Default configuration template
+// Default configuration template (MCP-friendly). All configurable values live in `env`.
 const defaultConfig = {
   "mcpollinations": {
     "command": "npx",
@@ -16,43 +16,28 @@ const defaultConfig = {
       "-y",
       "@pinkpixel/mcpollinations"
     ],
-    "resources": {
-      "output_dir": "./mcpollinations-output",
-    },
-    "auth": {
+    "env": {
+      // Auth (optional)
       "token": "",
-      "referrer": ""
-    },
-    "default_params": {
-      "image": {
-        "model": "flux",
-        "width": 1024,
-        "height": 1024,
-        "safe": false,
-        "enhance": true
-      },
-      "text": {
-        "model": "openai",
-        "temperature": 0.7,
-        "top_p": 0.9,
-        "system": ""
-      },
-      "audio": {
-        "voice": "alloy"
-      }
-    },
-    "disabled": false,
-    "alwaysAllow": [
-      "generateImageUrl",
-      "generateImage",
-      "editImage",
-      "generateImageFromReference",
-      "listImageModels",
-      "respondAudio",
-      "listAudioVoices",
-      "respondText",
-      "listTextModels"
-    ]
+      "referrer": "",
+
+      // Defaults used by the server when tool args are omitted
+      "IMAGE_MODEL": "flux",
+      "IMAGE_WIDTH": "1024",
+      "IMAGE_HEIGHT": "1024",
+      "IMAGE_SAFE": "false",
+      "IMAGE_ENHANCE": "true",
+
+      "TEXT_MODEL": "openai",
+      "TEXT_TEMPERATURE": "0.7",
+      "TEXT_TOP_P": "0.9",
+      "TEXT_SYSTEM": "",
+
+      "AUDIO_VOICE": "alloy",
+
+      // Default output directory for saved files
+      "OUTPUT_DIR": "./mcpollinations-output"
+    }
   }
 };
 
@@ -89,43 +74,32 @@ async function generateMcpConfig() {
   if (!useDefaults) {
     console.log('\nCustomizing configuration:');
 
-    // The server name and package name are fixed to ensure compatibility
     const configKey = 'mcpollinations';
 
     // Resources customization
     console.log('\nResource Directories:');
     console.log('Note: Using relative path (starting with "./") is recommended for portability.');
-    console.log('Absolute path is recommended on Windows or if you will not be moving the configuration file.');
+    console.log('Windows users may prefer absolute paths.');
     console.log('These directories will be created automatically if they don\'t exist.');
 
-    const outputDir = await prompt(`Output directory for saved files (default: "${config[configKey].resources.output_dir}"): `);
+    const outputDir = await prompt(`Output directory for saved files (default: "${config[configKey].env.OUTPUT_DIR}"): `);
     if (outputDir) {
-      config[configKey].resources.output_dir = outputDir;
+      config[configKey].env.OUTPUT_DIR = outputDir;
     }
 
     // Authentication configuration
     console.log('\nAuthentication Configuration (Optional):');
-    console.log('These settings are optional and should be used only if you are Flower or Nectar tier user. Configuring these settings will provide access to more models and better rate limits for those tiers.');
-    console.log('Leave empty to use the free (seed) tier. Note: some models may not be available without authentication.');
-    console.log('Note: You can also set these via environment variables POLLINATIONS_TOKEN and POLLINATIONS_REFERRER');
+    console.log('These env settings enable access to newer models and higher rate limits.');
+    console.log('Leave empty to use the free (seed) tier.');
 
     const authToken = await prompt('API Token (optional): ');
     if (authToken && authToken.trim()) {
-      config[configKey].auth.token = authToken.trim();
-    } else {
-      delete config[configKey].auth.token;
+      config[configKey].env.token = authToken.trim();
     }
 
-    const authReferrer = await prompt('Referrer URL (optional): ');
+    const authReferrer = await prompt('Referrer (domain or app id, optional): ');
     if (authReferrer && authReferrer.trim()) {
-      config[configKey].auth.referrer = authReferrer.trim();
-    } else {
-      delete config[configKey].auth.referrer;
-    }
-
-    // Remove auth section entirely if both fields are empty
-    if (!config[configKey].auth.token && !config[configKey].auth.referrer) {
-      delete config[configKey].auth;
+      config[configKey].env.referrer = authReferrer.trim();
     }
 
     // Default parameters customization
@@ -138,19 +112,19 @@ async function generateMcpConfig() {
     if (customizeImage) {
       console.log('Available image models: "flux", "turbo", "kontext", "nanobanana", "seedream". Use the listImageModels tool to see the most recent model list');
       const imageModel = await prompt('Default image model (default: "flux"): ');
-      if (imageModel) config[configKey].default_params.image.model = imageModel;
+      if (imageModel) config[configKey].env.IMAGE_MODEL = imageModel;
 
       const imageWidth = await prompt('Default image width (default: 1024): ');
-      if (imageWidth) config[configKey].default_params.image.width = parseInt(imageWidth);
+      if (imageWidth) config[configKey].env.IMAGE_WIDTH = String(parseInt(imageWidth));
 
       const imageHeight = await prompt('Default image height (default: 1024): ');
-      if (imageHeight) config[configKey].default_params.image.height = parseInt(imageHeight);
+      if (imageHeight) config[configKey].env.IMAGE_HEIGHT = String(parseInt(imageHeight));
 
       const imageSafe = await promptYesNo('Enable safe mode for images? (default: false)', false);
-      config[configKey].default_params.image.safe = imageSafe;
+      config[configKey].env.IMAGE_SAFE = imageSafe ? 'true' : 'false';
 
       const imageEnhance = await promptYesNo('Enable prompt enhancement using LLM before image generation?', true);
-      config[configKey].default_params.image.enhance = imageEnhance;
+      config[configKey].env.IMAGE_ENHANCE = imageEnhance ? 'true' : 'false';
     }
 
     // Text parameters
@@ -160,16 +134,16 @@ async function generateMcpConfig() {
     if (customizeText) {
       console.log('Some generally available text models: "openai", "openai-large", "openai-reasoning". Model choices change frequently - use the listTextModels tool to see all models');
       const textModel = await prompt('Default text model (default: "openai"): ');
-      if (textModel) config[configKey].default_params.text.model = textModel;
+      if (textModel) config[configKey].env.TEXT_MODEL = textModel;
 
       const textTemperature = await prompt('Default temperature (0.0-2.0, controls randomness, default: 0.7): ');
-      if (textTemperature) config[configKey].default_params.text.temperature = parseFloat(textTemperature);
+      if (textTemperature) config[configKey].env.TEXT_TEMPERATURE = String(parseFloat(textTemperature));
 
       const textTopP = await prompt('Default top_p (0.0-1.0, controls diversity, default: 0.9): ');
-      if (textTopP) config[configKey].default_params.text.top_p = parseFloat(textTopP);
+      if (textTopP) config[configKey].env.TEXT_TOP_P = String(parseFloat(textTopP));
 
       const textSystem = await prompt('Default system prompt (optional, guides model behavior): ');
-      if (textSystem) config[configKey].default_params.text.system = textSystem;
+      if (textSystem) config[configKey].env.TEXT_SYSTEM = textSystem;
     }
 
     // Audio parameters
@@ -179,44 +153,10 @@ async function generateMcpConfig() {
     if (customizeAudio) {
       console.log('Available voices: "alloy", "echo", "fable", "onyx", "nova", "shimmer", "coral", "verse", "ballad", "ash", "sage", "amuch", "dan"');
       const audioVoice = await prompt('Default voice (default: "alloy"): ');
-      if (audioVoice) config[configKey].default_params.audio.voice = audioVoice;
+      if (audioVoice) config[configKey].env.AUDIO_VOICE = audioVoice;
     }
 
-    // Tool restrictions
-    console.log('\nTool Restrictions:');
-    const disableServer = await promptYesNo('Disable the server by default?', false);
-    config[configKey].disabled = disableServer;
-
-    const customizeAllowedTools = await promptYesNo('Customize allowed tools?', false);
-    if (customizeAllowedTools) {
-      console.log('\nAvailable tools:');
-      const allTools = [
-        'generateImageUrl',
-        'generateImage',
-        'editImage',
-        'generateImageFromReference',
-        'listImageModels',
-        'respondAudio',
-        'listAudioVoices',
-        'respondText',
-        'listTextModels'
-      ];
-
-      allTools.forEach((tool, index) => {
-        console.log(`${index + 1}. ${tool}`);
-      });
-
-      const selectedTools = await prompt('Enter tool numbers to allow (comma-separated, e.g., "1,2,3") or "all" for all tools: ');
-
-      if (selectedTools.toLowerCase() === 'all') {
-        config[configKey].alwaysAllow = [...allTools];
-      } else {
-        const toolIndices = selectedTools.split(',').map(num => parseInt(num.trim()) - 1);
-        config[configKey].alwaysAllow = toolIndices
-          .filter(index => index >= 0 && index < allTools.length)
-          .map(index => allTools[index]);
-      }
-    }
+    // Tool restrictions removed; MCP clients usually control allow lists.
   }
 
   // Ask for output options
