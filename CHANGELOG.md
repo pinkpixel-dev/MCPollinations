@@ -5,6 +5,36 @@ All notable changes to the MCPollinations will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.2] - `2025-09-26`
+
+### Added
+- **New Image Models**: Added support for two new image generation models
+  - `nanobanana`: Google's new model supporting both text-to-image and image-to-image generation
+  - `seedream`: ByteDance's new model supporting both text-to-image and image-to-image generation
+  - Both models work identically to `kontext` for image-to-image operations (editImage, generateImageFromReference)
+  - Full support for all existing parameters: dimensions, seed, enhancement, safety filtering, file saving
+- **Enhanced Documentation**: Updated README.md and OVERVIEW.md to include new models
+  - Added examples showing usage with new models
+  - Updated supported models lists in all documentation
+- **Updated Configuration**: Enhanced MCP configuration generator to include new models in available options
+- **Test Suite**: Added comprehensive test files for MCP functionality
+  - `test-mcp-client.js`: Basic MCP protocol connectivity test
+  - `test-list-tools.js`: Tool enumeration and schema validation test
+  - `test-image-save.js`: Image generation and file saving functionality test
+  - `test-new-models.js`: Validation test for new image models
+  - `test-image-to-image.js`: Image-to-image functionality test with new models
+
+### Changed
+- **Schema Updates**: Updated tool schemas for `editImage` and `generateImageFromReference` to include new models in descriptions
+- **Dynamic Model Support**: All new models are automatically available through the existing `listImageModels` API endpoint
+- **Backward Compatibility**: All existing functionality remains unchanged - new models are additional options
+
+### Technical Details
+- New models use identical API patterns to existing models
+- Support for up to 4 input images (following Pollinations API patterns)
+- All existing parameters (width, height, seed, enhance, safe, etc.) work with new models
+- File saving, unique naming, and base64 encoding work identically across all models
+
 ## [1.2.1] - `2025-09-06`
 
 ### ⚠️ BREAKING CHANGES

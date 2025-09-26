@@ -267,6 +267,8 @@ Perfect for creating variations and new styles:
 
 ### **Supported Models**
 - **`kontext`**: Specialized model optimized for image-to-image tasks
+- **`nanobanana`**: New Google model supporting both text-to-image and image-to-image generation
+- **`seedream`**: New ByteDance model supporting both text-to-image and image-to-image generation
 
 ### **Example Usage**
 ```javascript
@@ -274,14 +276,14 @@ Perfect for creating variations and new styles:
 const editResult = await editImage(
   "change the background to a sunset beach",
   "https://example.com/photo.jpg",
-  "kontext"
+  "nanobanana"  // or "kontext", "seedream"
 );
 
 // Generate from reference
 const referenceResult = await generateImageFromReference(
   "make this into a watercolor painting",
   "https://example.com/photo.jpg",
-  "kontext"
+  "seedream"  // or "kontext", "nanobanana"
 );
 ```
 
@@ -303,6 +305,7 @@ When using the `generateImage` tool:
 // Example options for generateImage
 const options = {
   // Model selection (defaults to 'flux')
+  // Available models: "flux", "turbo", "kontext", "nanobanana", "seedream"
   model: "flux",
 
   // Image dimensions

@@ -129,7 +129,7 @@ export const editImageSchema = {
       },
       model: {
         type: 'string',
-        description: 'Model name to use for editing (default: user config or "kontext"). Available: "kontext"'
+        description: 'Model name to use for editing (default: user config or "kontext"). Available: "kontext", "nanobanana", "seedream"'
       },
       seed: {
         type: 'number',
@@ -187,7 +187,7 @@ export const generateImageFromReferenceSchema = {
       },
       model: {
         type: 'string',
-        description: 'Model name to use for generation (default: user config or "kontext"). Available: "kontext"'
+        description: 'Model name to use for generation (default: user config or "kontext"). Available: "kontext", "nanobanana", "seedream"'
       },
       seed: {
         type: 'number',
