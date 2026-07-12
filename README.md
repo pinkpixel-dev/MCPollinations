@@ -1,3 +1,5 @@
+**This server is archived as it no longer works with Pollinations newer API. Please see [Nectar-MCP](https://github.com/pinkpixel-dev/nectar-mcp) for my new Pollinations MCP server, specifically for image generation, image editing, and video generation.**
+
 # MCPollinations Multimodal MCP Server
 A Model Context Protocol (MCP) server that enables AI assistants to generate images, text, and audio through the Pollinations APIs
 
